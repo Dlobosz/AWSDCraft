@@ -1,0 +1,103 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap");
+:root {
+    --awsd-bg: #fcf6e8;
+    --awsd-surface: #ffffff;
+    --awsd-surface-2: #fdecd2;
+    --awsd-accent: #4cc9f0;
+    --awsd-accent-dark: #2ea9d6;
+    --awsd-accent-soft: #d7f3fb;
+    --awsd-text: #23303b;
+    --awsd-on-accent: #ffffff;
+    --awsd-muted: #6b7280;
+    --awsd-border: rgba(35, 48, 59, 0.1);
+    --awsd-success: #2ecc9a;
+    --awsd-danger: #e5484d;
+    --awsd-radius: 0.9rem;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--awsd-bg);
+    color: var(--awsd-text);
+    font-family: "Inter", sans-serif;
+}
+
+.awsd-title {
+    font-family: "Sora", sans-serif;
+    letter-spacing: -0.01em;
+}
+
+a {
+    text-decoration: none;
+}
+
+.text-awsd-accent {
+    color: var(--awsd-accent);
+}
+
+.section-kicker {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    color: var(--awsd-accent-dark);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.top-bar {
+    background-color: var(--awsd-accent);
+    color: var(--awsd-on-accent);
+    font-size: 0.82rem;
+}
+
+.top-bar .text-awsd-accent {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.awsd-navbar {
+    background-color: var(--awsd-bg);
+    border-bottom: 1px solid var(--awsd-border);
+}
+
+.awsd-navbar .nav-link {
+    color: var(--awsd-muted);
+    font-weight: 500;
+}
+
+.awsd-navbar .nav-link:hover {
+.awsd-navbar .nav-link:active 
+    color: var(--awsd-accent-dark);
+}
+
+.awsd-navbar .navbar-brand i {
+    color: var(--awsd-accent-dark);
+}
+
+.btn-awsd {
+    background-color: var(--awsd-accent);
+    border: none;
+    color: var(--awsd-on-accent);
+    font-weight: 600;
+}
+
+.btn-awsd:hover {
+  background-color: var(--awsd-accent-dark);
+  color: var(--awsd-on-accent);
+}
+
+.btn-outline-awsd {
+  border: 1px solid var(--awsd-accent-dark);
+  color: var(--awsd-accent-dark);
+  background: transparent;
+  font-weight: 600;
+}
+
+.btn-outline-awsd:hover {
+  background-color: var(--awsd-accent-dark);
+  color: var(--awsd-on-accent);
+}
+
