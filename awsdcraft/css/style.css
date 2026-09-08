@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap");
+:root {
+    --awsd-bg: #fcf6e8;
+    --awsd-surface: #ffffff;
+    --awsd-surface-2: #fdecd2;
+    --awsd-accent: #4cc9f0;
+    --awsd-accent-dark: #2ea9d6;
+    --awsd-accent-soft: #d7f3fb;
+    --awsd-text: #23303b;
+    --awsd-on-accent: #ffffff;
+    --awsd-muted: #6b7280;
+    --awsd-border: rgba(35, 48, 59, 0.1);
+    --awsd-success: #2ecc9a;
+    --awsd-danger: #e5484d;
+    --awsd-radius: 0.9rem;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--awsd-bg);
+    color: var(--awsd-text);
+    font-family: "Inter", sans-serif;
+}
+
+.awsd-title {
+    font-family: "Sora", sans-serif;
+    letter-spacing: -0.01em;
+}
+
+a {
+    text-decoration: none;
+}
+
+.text-awsd-accent {
+    color: var(--awsd-accent);
+}
+
+.section-kicker {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    color: var(--awsd-accent-dark);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
