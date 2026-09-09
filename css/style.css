@@ -233,3 +233,61 @@ a {
   text-decoration: underline;
 }
 
+.category-pill {
+  border: 1px solid var(--awsd-border);
+  background-color: var(--awsd-surface);
+  color: var(--awsd-muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.category-pill.active,
+.category-pill:hover {
+  background-color: var(--awsd-accent);
+  color: var(--awsd-on-accent);
+  border-color: var(--awsd-accent);
+}
+
+.qty-control {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--awsd-border);
+  border-radius: 0.6rem;
+  overflow: hidden;
+}
+
+.qty-control button {
+  background-color: var(--awsd-surface-2);
+  border: none;
+  width: 34px;
+  height: 34px;
+  font-weight: 700;
+  color: var(--awsd-text);
+}
+
+.qty-control input {
+  width: 46px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid var(--awsd-border);
+  border-right: 1px solid var(--awsd-border);
+  height: 34px;
+}
+
+.cart-item-img {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 0.6rem;
+  background-color: var(--awsd-surface-2);
+}
+
+.cart-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--awsd-muted);
+}
+
+
