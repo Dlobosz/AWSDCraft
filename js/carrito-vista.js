@@ -43,7 +43,7 @@ function renderizarCarrito() {
     })
     .join("");
 
-    const total = CalcularTotalCarrito();
+    const total = calcularTotalCarrito();
     document.getElementById("totalCarrito").textContent = formatearPrecio(total);
     document.getElementById("subtotalCarrito").textContent = formatearPrecio(total);
 }
