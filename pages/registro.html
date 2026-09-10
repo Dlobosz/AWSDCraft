@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear cuenta | AWSDCraft.cl</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <div class="top-bar text-center py-2">
+    <span><i class="bi bi-truck me-1"></i> Envíos a todo Chile</span>
+    <span class="mx-2">|</span>
+    <span class="text-awsd-accent">Arma tu teclado ideal esta primavera</span>
+  </div>
+
+  <header>
+    <nav class="navbar navbar-expand-lg awsd-navbar sticky-top py-3">
+      <div class="container">
+        <a class="navbar-brand awsd-title d-flex align-items-center gap-2" href="../index.html">
+          <i class="bi bi-keyboard fs-3"></i>
+          AWSDCraft<span class="text-awsd-accent">.cl</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAWSD"
+          aria-controls="navbarAWSD" aria-expanded="false" aria-label="Abrir navegación">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarAWSD">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center gap-lg-2">
+            <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="productos.html">Productos</a></li>
+            <li class="nav-item"><a class="nav-link" href="nosotros.html">Nosotros</a></li>
+            <li class="nav-item"><a class="nav-link" href="blogs.html">Blogs</a></li>
+            <li class="nav-item"><a class="nav-link" href="contacto.html">Contacto</a></li>
+            <li class="nav-item"><a class="nav-link" href="login.html">Iniciar sesión</a></li>
+            <li class="nav-item"><a class="nav-link active" href="registro.html">Registrarse</a></li>
+            <li class="nav-item">
+              <a class="nav-link cart-link" href="carrito.html" aria-label="Carrito de compras">
+                <i class="bi bi-cart3"></i>
+                <span class="cart-badge" id="contadorCarrito">0</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="text-center mb-4">
+          <span class="section-kicker">Únete</span>
+          <h1 class="awsd-title">Crea tu cuenta</h1>
+          <p class="text-secondary">Regístrate para guardar tus pedidos y direcciones.</p>
+        </div>
+
+        <div class="awsd-card p-4 p-md-5">
+          <div class="alert alert-success d-none" id="mensajeExitoRegistro" role="alert">
+            <i class="bi bi-check-circle me-2"></i>¡Cuenta creada con éxito! Te llevamos al inicio de sesión...
+          </div>
+
+          <form id="formRegistro" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="run" class="form-label">RUN (sin puntos ni guion)</label>
+                <input type="text" class="form-control" id="run" name="run" placeholder="190110229" maxlength="9">
+                <div class="invalid-feedback-awsd">Ingresa un RUN válido, sin puntos ni guion (7 a 9 caracteres).</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="fechaNacimiento" class="form-label">Fecha de nacimiento (opcional)</label>
+                <input type="date" class="form-control" id="fechaNacimiento" name="fechaNacimiento">
+              </div>
+
+              <div class="col-md-6">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" maxlength="50">
+                <div class="invalid-feedback-awsd">El nombre es obligatorio (máx. 50 caracteres).</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="apellidos" class="form-label">Apellidos</label>
+                <input type="text" class="form-control" id="apellidos" name="apellidos" maxlength="100">
+                <div class="invalid-feedback-awsd">Los apellidos son obligatorios (máx. 100 caracteres).</div>
+              </div>
+
+              <div class="col-12">
+                <label for="correo" class="form-label">Correo electrónico</label>
+                <input type="email" class="form-control" id="correo" name="correo" maxlength="100"
+                  placeholder="tucorreo@gmail.com">
+                <div class="invalid-feedback-awsd">Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com (máx. 100 caracteres).</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" maxlength="10">
+                <div class="invalid-feedback-awsd">Debe tener entre 4 y 10 caracteres.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="confirmarPassword" class="form-label">Confirmar contraseña</label>
+                <input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" maxlength="10">
+                <div class="invalid-feedback-awsd">Las contraseñas no coinciden.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="region" class="form-label">Región</label>
+                <select class="form-select" id="region" name="region">
+                  <option value="" selected disabled>-- Seleccione la región --</option>
+                </select>
+                <div class="invalid-feedback-awsd">Selecciona tu región.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="comuna" class="form-label">Comuna</label>
+                <select class="form-select" id="comuna" name="comuna" disabled>
+                  <option value="" selected disabled>-- Seleccione la comuna --</option>
+                </select>
+                <div class="invalid-feedback-awsd">Selecciona tu comuna.</div>
+              </div>
+
+              <div class="col-12">
+                <label for="direccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" maxlength="300">
+                <div class="invalid-feedback-awsd">La dirección es obligatoria (máx. 300 caracteres).</div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-awsd w-100 mt-4">Registrarme</button>
+            <p class="text-center small text-secondary mt-3 mb-0">
+              ¿Ya tienes cuenta? <a href="login.html" class="text-awsd-accent">Inicia sesión</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="awsd-footer py-4">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+      <span>&copy; 2026 AWSDCraft.cl. Todos los derechos reservados.</span>
+      <div class="d-flex gap-3">
+        <a href="nosotros.html">Nosotros</a>
+        <a href="contacto.html">Contacto</a>
+        <a href="blogs.html">Blogs</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/productos-data.js"></script>
+  <script src="../js/carrito.js"></script>
+  <script src="../js/regiones-comunas.js"></script>
+  <script src="../js/validadores.js"></script>
+  <script src="../js/validaciones-registro.js"></script>
+</body>
+</html>
