@@ -31,8 +31,6 @@ function obtenerProximoIdProducto() {
   return lista.length ? Math.max(...lista.map((p) => p.id)) + 1 : 1;
 }
 
-/* ---------- Usuarios ---------- */
-
 function obtenerUsuariosAdmin() {
   const guardado = localStorage.getItem("awsdcraft_admin_usuarios");
   if (!guardado) {
