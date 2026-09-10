@@ -291,3 +291,73 @@ a {
 }
 
 
+.admin-layout {
+  display: flex;
+  min-height: calc(100vh - 130px);
+}
+
+.admin-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: var(--awsd-surface);
+  border-right: 1px solid var(--awsd-border);
+  padding: 1.5rem 1rem;
+}
+
+.admin-sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.6rem;
+  color: var(--awsd-muted);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.admin-sidebar a:hover,
+.admin-sidebar a.active {
+  background-color: var(--awsd-accent-soft);
+  color: var(--awsd-accent-dark);
+}
+
+.admin-content {
+  flex-grow: 1;
+  padding: 2rem;
+}
+
+.admin-stat-card {
+  background-color: var(--awsd-surface);
+  border: 1px solid var(--awsd-border);
+  border-radius: var(--awsd-radius);
+  padding: 1.25rem;
+}
+
+.admin-stat-card .stat-numero {
+  font-family: "Sora", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--awsd-accent-dark);
+}
+
+.admin-table th {
+  color: var(--awsd-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 2px solid var(--awsd-border);
+}
+
+.admin-table td {
+  vertical-align: middle;
+  border-bottom: 1px solid var(--awsd-border);
+}
+
+.badge-stock-critico {
+  background-color: #fff1e6;
+  color: #c2410c;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
