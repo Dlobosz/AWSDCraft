@@ -1,9 +1,7 @@
 function formatearPrecio(valor) {
   return "$" + valor.toLocaleString("es-CL");
 }
-
-@param {Object} 
-@param {string}                               
+                            
 function crearTarjetaProducto(producto, prefijoEnlace) {
   const detalleUrl = `${prefijoEnlace}detalle-producto.html?id=${producto.id}`;
   const sinStock = producto.stock === 0;

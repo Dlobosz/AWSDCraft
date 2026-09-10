@@ -1,4 +1,3 @@
-@param {string} run - RUN sin puntos ni guion, ej: "190110229"
 function validarRun(run) {
   const limpio = run.trim().toUpperCase();
 
