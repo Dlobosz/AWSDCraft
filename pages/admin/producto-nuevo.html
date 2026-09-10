@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar producto | Admin AWSDCraft.cl</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../../css/style.css" />
+</head>
+<body>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a href="../../index.html" class="awsd-title d-flex align-items-center gap-2 mb-4 text-decoration-none">
+        <i class="bi bi-keyboard fs-4"></i>
+        <span>AWSDCraft<span class="text-awsd-accent">.cl</span></span>
+      </a>
+      <nav>
+        <a href="home.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="productos-listado.html" class="active"><i class="bi bi-box-seam"></i> Productos</a>
+        <a href="usuarios-listado.html"><i class="bi bi-people"></i> Usuarios</a>
+      </nav>
+    </aside>
+
+    <div class="admin-content">
+      <h1 class="awsd-title h3 mb-4" id="tituloForm">Editar producto</h1>
+
+      <div class="admin-stat-card">
+        <form id="formProducto" novalidate>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="codigo" class="form-label">Código</label>
+              <input type="text" class="form-control" id="codigo">
+              <div class="invalid-feedback-awsd">Mínimo 3 caracteres.</div>
+            </div>
+            <div class="col-md-8">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input type="text" class="form-control" id="nombre" maxlength="100">
+              <div class="invalid-feedback-awsd">Obligatorio, máx. 100 caracteres.</div>
+            </div>
+
+            <div class="col-12">
+              <label for="descripcion" class="form-label">Descripción (opcional)</label>
+              <textarea class="form-control" id="descripcion" rows="3" maxlength="500"></textarea>
+              <div class="invalid-feedback-awsd">Máximo 500 caracteres.</div>
+            </div>
+
+            <div class="col-md-4">
+              <label for="precio" class="form-label">Precio</label>
+              <input type="number" class="form-control" id="precio" min="0" step="1">
+              <div class="invalid-feedback-awsd">Debe ser 0 o mayor.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="stock" class="form-label">Stock</label>
+              <input type="number" class="form-control" id="stock" min="0" step="1">
+              <div class="invalid-feedback-awsd">Entero, 0 o mayor.</div>
+            </div>
+            <div class="col-md-4">
+              <label for="stockCritico" class="form-label">Stock crítico (opcional)</label>
+              <input type="number" class="form-control" id="stockCritico" min="0" step="1">
+              <div class="invalid-feedback-awsd">Entero, 0 o mayor.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="categoria" class="form-label">Categoría</label>
+              <select class="form-select" id="categoria">
+                <option value="" selected disabled>-- Seleccione --</option>
+              </select>
+              <div class="invalid-feedback-awsd">Selecciona una categoría.</div>
+            </div>
+            <div class="col-md-6">
+              <label for="imagen" class="form-label">Imagen (URL, opcional)</label>
+              <input type="text" class="form-control" id="imagen" placeholder="https://...">
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-awsd">Guardar producto</button>
+            <a href="productos-listado.html" class="btn btn-outline-awsd">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/productos-data.js"></script>
+  <script src="../../js/usuarios-data.js"></script>
+  <script src="../../js/admin-datos.js"></script>
+  <script src="../../js/admin-producto-form.js"></script>
+</body>
+</html>

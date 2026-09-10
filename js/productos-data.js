@@ -1,6 +1,7 @@
 const productos = [
   {
     id: 1,
+    codigo: "TCL-001",
     nombre: "Teclado TKL 87 teclas",
     categoria: "teclados",
     precio: 49990,
@@ -13,6 +14,7 @@ const productos = [
   },
   {
     id: 2,
+    codigo: "TCL-002",
     nombre: "Teclado Full Size 108 teclas",
     categoria: "teclados",
     precio: 54990,
@@ -25,6 +27,7 @@ const productos = [
   },
   {
     id: 3,
+    codigo: "TCL-003",
     nombre: "Teclado 60% Compacto",
     categoria: "teclados",
     precio: 42990,
@@ -37,6 +40,7 @@ const productos = [
   },
   {
     id: 4,
+    codigo: "TCL-004",
     nombre: "Kit teclado 65% (case + PCB + plate)",
     categoria: "kits",
     precio: 65000,
@@ -49,6 +53,7 @@ const productos = [
   },
   {
     id: 5,
+    codigo: "TCL-005",
     nombre: "Kit teclado 75% Gasket Mount",
     categoria: "kits",
     precio: 78000,
@@ -61,6 +66,7 @@ const productos = [
   },
   {
     id: 6,
+    codigo: "TCL-006",
     nombre: "Set Keycaps PBT Cherry Profile",
     categoria: "keycaps",
     precio: 24990,
@@ -73,6 +79,7 @@ const productos = [
   },
   {
     id: 7,
+    codigo: "TCL-007",
     nombre: "Set Keycaps Primavera Pastel",
     categoria: "keycaps",
     precio: 27990,
@@ -85,6 +92,7 @@ const productos = [
   },
   {
     id: 8,
+    codigo: "TCL-008",
     nombre: "Pack 90 Switches Lineales",
     categoria: "switches",
     precio: 18500,
@@ -97,6 +105,7 @@ const productos = [
   },
   {
     id: 9,
+    codigo: "TCL-009",
     nombre: "Pack 90 Switches Táctiles",
     categoria: "switches",
     precio: 19500,
@@ -109,6 +118,7 @@ const productos = [
   },
   {
     id: 10,
+    codigo: "TCL-010",
     nombre: "Reposamuñecas Ergonómico",
     categoria: "accesorios",
     precio: 12990,
@@ -121,6 +131,7 @@ const productos = [
   },
   {
     id: 11,
+    codigo: "TCL-011",
     nombre: "Cable USB-C Coiled Celeste",
     categoria: "accesorios",
     precio: 9990,
@@ -133,6 +144,7 @@ const productos = [
   },
   {
     id: 12,
+    codigo: "TCL-012",
     nombre: "Herramienta Extractora de Keycaps",
     categoria: "accesorios",
     precio: 4990,

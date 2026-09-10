@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Productos | Admin AWSDCraft.cl</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../../css/style.css" />
+</head>
+<body>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <a href="../../index.html" class="awsd-title d-flex align-items-center gap-2 mb-4 text-decoration-none">
+        <i class="bi bi-keyboard fs-4"></i>
+        <span>AWSDCraft<span class="text-awsd-accent">.cl</span></span>
+      </a>
+      <nav>
+        <a href="home.html"><i class="bi bi-speedometer2"></i> Dashboard</a>
+        <a href="productos-listado.html" class="active"><i class="bi bi-box-seam"></i> Productos</a>
+        <a href="usuarios-listado.html"><i class="bi bi-people"></i> Usuarios</a>
+      </nav>
+    </aside>
+
+    <div class="admin-content">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="awsd-title h3 mb-0">Productos</h1>
+        <a href="producto-nuevo.html" class="btn btn-awsd btn-sm">
+          <i class="bi bi-plus-lg me-1"></i>Nuevo producto
+        </a>
+      </div>
+
+      <div class="admin-stat-card p-0">
+        <table class="table admin-table mb-0">
+          <thead>
+            <tr>
+              <th class="ps-3">Código</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th class="text-end pe-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaProductos">
+            <tr><td colspan="6" class="text-center text-secondary py-4">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/productos-data.js"></script>
+  <script src="../../js/usuarios-data.js"></script>
+  <script src="../../js/admin-datos.js"></script>
+  <script src="../../js/render-productos.js"></script>
+  <script src="../../js/admin-productos-listado.js"></script>
+</body>
+</html>
