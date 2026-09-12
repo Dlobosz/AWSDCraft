@@ -129,7 +129,7 @@ a {
   position: relative;
   background:
     linear-gradient(180deg, rgba(252, 246, 232, 0.90) 0%, rgba(252, 246, 232, 0.80) 100%),
-    url("../img/fondo-home.jpg") center/cover no-repeat;
+    url("../img/fondo-home.jfif") center/cover no-repeat;
   border-bottom: 1px solid var(--awsd-border);
 }
 
