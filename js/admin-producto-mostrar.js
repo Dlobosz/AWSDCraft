@@ -13,8 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   contenedor.innerHTML = `
     <div class="row g-4">
-      <div class="col-md-4">
-        <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid rounded-3 border" style="border-color: var(--awsd-border) !important;">
+       <div class="col-md-4">
+        <img src="../../img/${producto.imagen}" alt="${producto.nombre}" class="img-fluid rounded-3 border" style="border-color: var(--awsd-border) !important;">
       </div>
       <div class="col-md-8">
         <h2 class="h4 awsd-title mb-3">${producto.nombre}</h2>

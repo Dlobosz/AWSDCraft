@@ -9,7 +9,7 @@ const productos = [
     stockCritico: 3,
     switch: "Red (lineal)",
     descripcion: "Teclado mecánico TenKeyLess de 87 teclas, PCB hot-swap, cable USB-C desmontable.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=TKL+87",
+    imagen: "teclado-87.webp",
     destacado: true,
   },
   {
@@ -22,7 +22,7 @@ const productos = [
     stockCritico: 3,
     switch: "Brown (táctil)",
     descripcion: "Layout completo con teclado numérico, retroiluminación RGB por tecla.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Full+Size",
+    imagen: "teclado-full-size.webp",
     destacado: false,
   },
   {
@@ -35,7 +35,7 @@ const productos = [
     stockCritico: 5,
     switch: "Blue (clicky)",
     descripcion: "El favorito para setups minimalistas: sin numpad, sin fila de función.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=60%25",
+    imagen: "teclado-60.webp",
     destacado: false,
   },
   {
@@ -48,7 +48,7 @@ const productos = [
     stockCritico: 3,
     switch: "No incluye switches",
     descripcion: "Case de aluminio, PCB hot-swap y plate de policarbonato. Compatible 3 y 5 pines.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Kit+65%25",
+    imagen: "kit-65.webp",
     destacado: true,
   },
   {
@@ -61,7 +61,7 @@ const productos = [
     stockCritico: 2,
     switch: "No incluye switches",
     descripcion: "Montaje gasket para un typing feel suave. Foam interno y estabilizadores lubricados.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Kit+75%25",
+    imagen: "kit-75.webp",
     destacado: false,
   },
   {
@@ -74,7 +74,7 @@ const productos = [
     stockCritico: 8,
     switch: "N/A",
     descripcion: "108 teclas en perfil Cherry, doble disparo (dye-sub), compatibles con ANSI 60% a Full Size.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Keycaps+PBT",
+    imagen: "keycaps-pbt.webp",
     destacado: true,
   },
   {
@@ -87,7 +87,7 @@ const productos = [
     stockCritico: 5,
     switch: "N/A",
     descripcion: "Edición temática en tonos celestes, verdes y crema.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Keycaps+Primavera",
+    imagen: "keycaps-primavera.webp",
     destacado: true,
   },
   {
@@ -100,7 +100,7 @@ const productos = [
     stockCritico: 10,
     switch: "Lineal, 45g",
     descripcion: "Switches pre-lubricados, ideales para escritura silenciosa y gaming rápido.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Switches+Lineales",
+    imagen: "switches-lineales.webp",
     destacado: false,
   },
   {
@@ -113,7 +113,7 @@ const productos = [
     stockCritico: 8,
     switch: "Táctil, 55g",
     descripcion: "El punto medio entre lineal y clicky: sientes el punto de actuación sin ruido.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Switches+Tactiles",
+    imagen: "switches-tactiles.webp",
     destacado: false,
   },
   {
@@ -126,7 +126,7 @@ const productos = [
     stockCritico: 6,
     switch: "N/A",
     descripcion: "Espuma viscoelástica forrada en cuero vegano, reduce tensión de muñeca.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Reposamuñecas",
+    imagen: "reposamuñecas-ergonómico.webp",
     destacado: false,
   },
   {
@@ -139,7 +139,7 @@ const productos = [
     stockCritico: 3,
     switch: "N/A",
     descripcion: "Cable en espiral de 1.8m, conector aviador desmontable, en celeste de marca.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Cable+Coiled",
+    imagen: "cable-usb-c-coiled-celeste.webp",
     destacado: false,
   },
   {
@@ -152,7 +152,7 @@ const productos = [
     stockCritico: 10,
     switch: "N/A",
     descripcion: "Extractor de alambre que no raya tus keycaps. Incluye extractor de switches.",
-    imagen: "https://placehold.co/500x400/4cc9f0/ffffff?text=Extractor",
+    imagen: "herramienta-extractora-keycaps.webp",
     destacado: false,
   },
 ];

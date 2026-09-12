@@ -126,9 +126,10 @@ a {
 }
 
 .hero {
+  position: relative;
   background:
-    radial-gradient(circle at 12% 20%, rgba(76, 201, 240, 0.18), transparent 32%),
-    var(--awsd-bg);
+    linear-gradient(180deg, rgba(252, 246, 232, 0.90) 0%, rgba(252, 246, 232, 0.80) 100%),
+    url("../img/fondo-home.jpg") center/cover no-repeat;
   border-bottom: 1px solid var(--awsd-border);
 }
 

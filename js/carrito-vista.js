@@ -22,7 +22,7 @@ function renderizarCarrito() {
 
       return `
         <div class="awsd-card p-3 d-flex align-items-center gap-3">
-          <img src="${producto.imagen}" alt="${producto.nombre}" class="cart-item-img">
+          <img src="../img/${producto.imagen}" alt="${producto.nombre}" class="cart-item-img">
           <div class="flex-grow-1">
             <h3 class="h6 mb-1">${producto.nombre}</h3>
             <p class="small text-secondary mb-2">${formatearPrecio(producto.precio)} c/u</p>

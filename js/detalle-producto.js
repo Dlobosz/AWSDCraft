@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   contenedor.innerHTML = `
     <div class="col-md-6">
-      <img src="${producto.imagen}" alt="${producto.nombre}" class="img-fluid rounded-4 border" style="border-color: var(--awsd-border) !important;">
+       <img src="../img/${producto.imagen}" alt="${producto.nombre}" class="img-fluid rounded-4 border" style="border-color: var(--awsd-border) !important;">
     </div>
     <div class="col-md-6">
       <span class="section-kicker">${producto.categoria}</span>

@@ -5,12 +5,14 @@ function formatearPrecio(valor) {
 function crearTarjetaProducto(producto, prefijoEnlace) {
   const detalleUrl = `${prefijoEnlace}detalle-producto.html?id=${producto.id}`;
   const sinStock = producto.stock === 0;
+  const raizImg = prefijoEnlace === "pages/" ? "" : "../";
+  const srcImagen = `${raizImg}img/${producto.imagen}`;
 
   return `
     <article class="col-6 col-md-4 col-lg-3">
       <div class="product-card">
         <a href="${detalleUrl}">
-          <img src="${producto.imagen}" alt="${producto.nombre}">
+          <img src="${srcImagen}" alt="${producto.nombre}">
         </a>
         <div class="product-body">
           <a href="${detalleUrl}" class="text-decoration-none text-reset">
