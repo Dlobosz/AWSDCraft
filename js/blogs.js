@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
       (post) => `
       <article class="col-md-6">
         <div class="product-card h-100">
-          <img src="${post.imagen}" alt="${post.titulo}">
+          <img src="../img/${post.imagen}" alt="${post.titulo}">
           <div class="product-body">
             <h2 class="h5 mb-2">${post.titulo}</h2>
             <p class="text-secondary small mb-3">${post.resumen}</p>
