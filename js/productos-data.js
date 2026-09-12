@@ -22,7 +22,7 @@ const productos = [
     stockCritico: 3,
     switch: "Brown (táctil)",
     descripcion: "Layout completo con teclado numérico, retroiluminación RGB por tecla.",
-    imagen: "teclado-full-size.webp",
+    imagen: "teclado-fullsize.jpg",
     destacado: false,
   },
   {
@@ -35,7 +35,7 @@ const productos = [
     stockCritico: 5,
     switch: "Blue (clicky)",
     descripcion: "El favorito para setups minimalistas: sin numpad, sin fila de función.",
-    imagen: "teclado-60.webp",
+    imagen: "teclado-60.jpg",
     destacado: false,
   },
   {
@@ -48,7 +48,7 @@ const productos = [
     stockCritico: 3,
     switch: "No incluye switches",
     descripcion: "Case de aluminio, PCB hot-swap y plate de policarbonato. Compatible 3 y 5 pines.",
-    imagen: "kit-65.webp",
+    imagen: "kit-65-montaje.jpg",
     destacado: true,
   },
   {
@@ -61,7 +61,7 @@ const productos = [
     stockCritico: 2,
     switch: "No incluye switches",
     descripcion: "Montaje gasket para un typing feel suave. Foam interno y estabilizadores lubricados.",
-    imagen: "kit-75.webp",
+    imagen: "teclado-75-gasket.jpg",
     destacado: false,
   },
   {
@@ -74,7 +74,7 @@ const productos = [
     stockCritico: 8,
     switch: "N/A",
     descripcion: "108 teclas en perfil Cherry, doble disparo (dye-sub), compatibles con ANSI 60% a Full Size.",
-    imagen: "keycaps-pbt.webp",
+    imagen: "keycaps-cherry.jpg",
     destacado: true,
   },
   {
@@ -100,7 +100,7 @@ const productos = [
     stockCritico: 10,
     switch: "Lineal, 45g",
     descripcion: "Switches pre-lubricados, ideales para escritura silenciosa y gaming rápido.",
-    imagen: "switches-lineales.webp",
+    imagen: "switch-lineal.webp",
     destacado: false,
   },
   {
@@ -113,7 +113,7 @@ const productos = [
     stockCritico: 8,
     switch: "Táctil, 55g",
     descripcion: "El punto medio entre lineal y clicky: sientes el punto de actuación sin ruido.",
-    imagen: "switches-tactiles.webp",
+    imagen: "switch-tactil.png",
     destacado: false,
   },
   {
@@ -126,7 +126,7 @@ const productos = [
     stockCritico: 6,
     switch: "N/A",
     descripcion: "Espuma viscoelástica forrada en cuero vegano, reduce tensión de muñeca.",
-    imagen: "reposamuñecas-ergonómico.webp",
+    imagen: "reposamunecas.avif",
     destacado: false,
   },
   {
@@ -139,7 +139,7 @@ const productos = [
     stockCritico: 3,
     switch: "N/A",
     descripcion: "Cable en espiral de 1.8m, conector aviador desmontable, en celeste de marca.",
-    imagen: "cable-usb-c-coiled-celeste.webp",
+    imagen: "cable-usb-celeste.png",
     destacado: false,
   },
   {
@@ -152,7 +152,7 @@ const productos = [
     stockCritico: 10,
     switch: "N/A",
     descripcion: "Extractor de alambre que no raya tus keycaps. Incluye extractor de switches.",
-    imagen: "herramienta-extractora-keycaps.webp",
+    imagen: "extractor-keycap.jpg",
     destacado: false,
   },
 ];
