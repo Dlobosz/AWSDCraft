@@ -362,3 +362,9 @@ a {
   padding: 0.25rem 0.6rem;
   border-radius: 999px;
 }
+
+.navbar-logo-img {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}

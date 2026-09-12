@@ -12,7 +12,7 @@ const productos = [
     imagen: "teclado-87.webp",
     destacado: true,
   },
-  {
+  { 
     id: 2,
     codigo: "TCL-002",
     nombre: "Teclado Full Size 108 teclas",
