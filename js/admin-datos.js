@@ -14,7 +14,6 @@ function protegerVistaAdmin() {
       window.location.href = "../login.html";
     }
   } catch (error) {
-    // Sesión corrupta: por seguridad, tratamos como "no autenticado".
     window.location.href = "../login.html";
   }
 }

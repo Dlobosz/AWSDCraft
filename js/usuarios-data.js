@@ -4,7 +4,7 @@ const usuariosSemilla = [
     run: "190110229",
     nombre: "Diego",
     apellidos: "Lobos Ortiz",
-    correo: "dlobos.or@gmail.com",
+    correo: "diegolobos@gmail.com",
     fechaNacimiento: "",
     tipoUsuario: "Administrador",
     region: "Región Metropolitana de Santiago",
