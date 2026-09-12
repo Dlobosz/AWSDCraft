@@ -19,7 +19,7 @@ const blogs = [
       a modificar y "tunear" sus propios switches en casa. En AWSDCraft.cl seleccionamos
       los que consideramos el mejor punto de partida para quienes recién empiezan,
       y opciones más avanzadas para quienes ya saben exactamente qué buscan.`,
-      imagen: "switch-lineal.webp",
+      imagen: "escoger-switch.webp",
   },
   {
     id: 2,
@@ -41,6 +41,6 @@ const blogs = [
       decidir si te gusta — la curva de aprendizaje de los atajos con Fn es real, pero
       la mayoría de los usuarios terminan encontrándolo más rápido que un teclado
       completo, una vez que memorizan las combinaciones.`,
-      imagen: "teclado-60.jpg",
+      imagen: "elige-teclado.webp",
   },
 ];
