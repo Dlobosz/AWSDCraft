@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     mensajeExito.classList.remove("d-none");
 
     setTimeout(() => {
-      window.location.href = "../index.html";
+      window.location.href = "admin/home.html";
     }, 1200);
   });
 });
