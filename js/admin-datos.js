@@ -2,8 +2,19 @@ const CATEGORIAS_PRODUCTO = ["teclados", "kits", "keycaps", "switches", "accesor
 const TIPOS_USUARIO = ["Administrador", "Vendedor", "Cliente"];
 
 function protegerVistaAdmin() {
-  const sesion = localStorage.getItem("awsdcraft_sesion");
-  if (!sesion) {
+  const sesionGuardada = localStorage.getItem("awsdcraft_sesion");
+  if (!sesionGuardada) {
+    window.location.href = "../login.html";
+    return;
+  }
+
+  try {
+    const sesion = JSON.parse(sesionGuardada);
+    if (sesion.tipoUsuario !== "Administrador") {
+      window.location.href = "../login.html";
+    }
+  } catch (error) {
+    // Sesión corrupta: por seguridad, tratamos como "no autenticado".
     window.location.href = "../login.html";
   }
 }

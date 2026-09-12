@@ -42,13 +42,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     mensajeError.classList.add("d-none");
-    localStorage.setItem("awsdcraft_sesion", JSON.stringify({ correo: campoCorreo.value.trim() }));
+
+    const correoIngresado = campoCorreo.value.trim().toLowerCase();
+    const usuarioEncontrado = obtenerUsuariosAdmin().find(
+      (u) => u.correo.toLowerCase() === correoIngresado
+    );
+    const tipoUsuario = usuarioEncontrado ? usuarioEncontrado.tipoUsuario : "Cliente";
+
+    localStorage.setItem(
+      "awsdcraft_sesion",
+      JSON.stringify({ correo: campoCorreo.value.trim(), tipoUsuario })
+    );
 
     const mensajeExito = document.getElementById("mensajeExitoLogin");
     mensajeExito.classList.remove("d-none");
 
     setTimeout(() => {
-      window.location.href = "admin/home.html";
+      window.location.href = tipoUsuario === "Administrador" ? "admin/home.html" : "../index.html";
     }, 1200);
   });
 });
