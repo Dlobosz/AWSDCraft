@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import BuscadorProductos from "../../componentes/BuscadorProductos";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
 import { buscarProductos, eliminarProducto, listarProductos } from "../../servicios/productosServicio";
 import { formatearPrecio } from "../../utilidades/formato";
 
 export default function ProductosListado() {
+  const ubicacion = useLocation();
   const [productos, setProductos] = useState(listarProductos);
   const [termino, setTermino] = useState("");
-  const [aviso, setAviso] = useState("");
+  const [aviso, setAviso] = useState(ubicacion.state ? ubicacion.state.aviso : "");
 
   const visibles = buscarProductos(productos, termino);
 

@@ -1,7 +1,7 @@
 # AWSDCraft.cl — Frontend en React (Evaluación Parcial 2)
 
 Migración de la tienda AWSDCraft.cl desde HTML/CSS/JS a React con Vite, Bootstrap 5 y
-pruebas unitarias con Jasmine + Karma.
+pruebas unitarias con Vitest y Testing Library.
 
 ## Instalación
 
@@ -23,7 +23,13 @@ La aplicación queda disponible en http://localhost:5173
 npm test
 ```
 
-El reporte de cobertura se genera en la carpeta `coverage/`.
+Para el informe de cobertura:
+
+```
+npm run test:coverage
+```
+
+El reporte se genera en la carpeta `coverage/`.
 
 ## Estructura
 
@@ -37,7 +43,7 @@ El reporte de cobertura se genera en la carpeta `coverage/`.
 | `src/servicios` | Operaciones CRUD y persistencia en localStorage |
 | `src/datos` | Archivos de datos simulados (productos, usuarios, categorías, blogs, regiones) |
 | `src/utilidades` | Validaciones y funciones de formato |
-| `src/pruebas` | Especificaciones Jasmine |
+| `src/pruebas` | Especificaciones de Vitest |
 
 ## Usuarios de prueba
 

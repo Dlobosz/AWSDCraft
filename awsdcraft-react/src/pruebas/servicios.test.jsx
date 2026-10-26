@@ -1,3 +1,5 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { CLAVES } from "../servicios/almacenamiento";
 import {
   agregarItem,
@@ -7,11 +9,17 @@ import {
   quitarItem,
 } from "../servicios/carritoServicio";
 import {
+  actualizarProducto,
   buscarProductos,
   crearProducto,
+  descontarStock,
   eliminarProducto,
+  listarCriticos,
+  listarOfertas,
   listarProductos,
+  obtenerProducto,
 } from "../servicios/productosServicio";
+import { crearOrden, listarOrdenes, totalVendido } from "../servicios/ordenesServicio";
 import { formatearPrecio, precioConDescuento } from "../utilidades/formato";
 import { correoPermitido, passwordValida, validarRun } from "../utilidades/validadores";
 
@@ -68,7 +76,7 @@ describe("Servicio de carrito", () => {
   it("agrega un producto nuevo al carrito", () => {
     const carrito = agregarItem([], producto, 1);
 
-    expect(carrito.length).toBe(1);
+    expect(carrito).toHaveLength(1);
     expect(carrito[0].nombre).toBe("Teclado TKL 87 teclas");
     expect(carrito[0].cantidad).toBe(1);
   });
@@ -76,7 +84,7 @@ describe("Servicio de carrito", () => {
   it("suma la cantidad cuando el producto ya está en el carrito", () => {
     const carrito = agregarItem(agregarItem([], producto, 1), producto, 1);
 
-    expect(carrito.length).toBe(1);
+    expect(carrito).toHaveLength(1);
     expect(carrito[0].cantidad).toBe(2);
   });
 
@@ -102,42 +110,51 @@ describe("Servicio de carrito", () => {
   it("quita un producto del carrito", () => {
     const carrito = quitarItem(agregarItem([], producto, 1), 1);
 
-    expect(carrito.length).toBe(0);
+    expect(carrito).toHaveLength(0);
   });
 });
 
-describe("Servicio de productos con persistencia simulada", () => {
-  let almacen;
-
+describe("Servicio de productos", () => {
   beforeEach(() => {
-    almacen = {};
-    spyOn(localStorage, "getItem").and.callFake((clave) =>
-      Object.prototype.hasOwnProperty.call(almacen, clave) ? almacen[clave] : null
-    );
-    spyOn(localStorage, "setItem").and.callFake((clave, valor) => {
-      almacen[clave] = String(valor);
-    });
+    vi.spyOn(Storage.prototype, "setItem");
   });
 
   it("carga los productos semilla la primera vez y los guarda en localStorage", () => {
     const lista = listarProductos();
 
-    expect(lista.length).toBe(12);
+    expect(lista).toHaveLength(12);
     expect(localStorage.setItem).toHaveBeenCalled();
-    expect(almacen[CLAVES.productos]).toBeDefined();
+    expect(localStorage.getItem(CLAVES.productos)).not.toBeNull();
   });
 
   it("crea un producto nuevo asignando el siguiente identificador", () => {
     const creado = crearProducto({ codigo: "TCL-099", nombre: "Teclado de prueba", precio: 1000 });
 
     expect(creado.id).toBe(13);
-    expect(listarProductos().length).toBe(13);
+    expect(listarProductos()).toHaveLength(13);
+  });
+
+  it("actualiza el stock de un producto y lo persiste", () => {
+    actualizarProducto(1, { stock: 0 });
+
+    expect(obtenerProducto(1).stock).toBe(0);
+    expect(obtenerProducto("1").stock).toBe(0);
+  });
+
+  it("conserva los campos que no se modifican al actualizar", () => {
+    const original = obtenerProducto(2);
+    actualizarProducto(2, { stock: 4 });
+    const actualizado = obtenerProducto(2);
+
+    expect(actualizado.stock).toBe(4);
+    expect(actualizado.nombre).toBe(original.nombre);
+    expect(actualizado.precio).toBe(original.precio);
   });
 
   it("elimina un producto existente de la colección", () => {
     const restantes = eliminarProducto(1);
 
-    expect(restantes.length).toBe(11);
+    expect(restantes).toHaveLength(11);
     expect(restantes.find((item) => item.id === 1)).toBeUndefined();
   });
 
@@ -146,5 +163,39 @@ describe("Servicio de productos con persistencia simulada", () => {
 
     expect(resultado.length).toBeGreaterThan(0);
     expect(resultado.every((item) => item.nombre.toLowerCase().includes("keycaps"))).toBe(true);
+  });
+
+  it("lista solo los productos que tienen descuento", () => {
+    const ofertas = listarOfertas();
+
+    expect(ofertas.length).toBeGreaterThan(0);
+    expect(ofertas.every((item) => item.descuento > 0)).toBe(true);
+  });
+
+  it("identifica los productos cuyo stock llegó al mínimo definido", () => {
+    const criticos = listarCriticos();
+
+    expect(criticos.every((item) => item.stock <= item.stockCritico)).toBe(true);
+  });
+
+  it("descuenta el stock de los productos comprados", () => {
+    const antes = obtenerProducto(3).stock;
+    descontarStock([{ id: 3, cantidad: 2 }]);
+
+    expect(obtenerProducto(3).stock).toBe(antes - 2);
+  });
+});
+
+describe("Servicio de órdenes", () => {
+  it("crea una orden con código y fecha, y suma solo las pagadas", () => {
+    crearOrden({ correo: "diegolobos@gmail.com", items: [], total: 10000, estado: "Pagada" });
+    crearOrden({ correo: "diegolobos@gmail.com", items: [], total: 5000, estado: "Rechazada" });
+
+    const ordenes = listarOrdenes();
+
+    expect(ordenes).toHaveLength(2);
+    expect(ordenes[0].codigo).toBe("ORDEN10001");
+    expect(ordenes[0].fecha).toBeDefined();
+    expect(totalVendido()).toBe(10000);
   });
 });
