@@ -2,7 +2,23 @@
 
 Tienda online de teclados mecánicos personalizados — kits, teclados armados, keycaps, switches y accesorios.
 
-Proyecto desarrollado para la **Evaluación Parcial 1** de la asignatura **DSY1104 – Desarrollo Fullstack II** (Duoc UC).
+Proyecto semestral de la asignatura **DSY1104 – Desarrollo Fullstack II** (Duoc UC).
+
+## Estado actual (Evaluación Parcial 3)
+
+| Parte | Ubicación | Tecnología |
+|---|---|---|
+| **Frontend** (versión vigente) | carpeta [`awsdcraft-react/`](awsdcraft-react/README.md) de este repositorio | React 18 + Vite + Axios |
+| **Backend** (API REST) | repositorio **AWSDCraft-backend** | Spring Boot 4 + MySQL + JWT |
+| Sitio HTML original (Evaluación 1) | raíz de este repositorio (`index.html`, `pages/`, `js/`) | HTML, CSS y JavaScript |
+
+En la Evaluación 3 el frontend React dejó de usar `localStorage` para los datos del negocio: ahora consume la API REST del backend, inicia sesión con JWT, mantiene la sesión al recargar la página y restringe pantallas y acciones según el rol (Administrador, Vendedor, Cliente). Las instrucciones para ejecutarlo están en [`awsdcraft-react/README.md`](awsdcraft-react/README.md).
+
+---
+
+## Evaluación Parcial 1: sitio en HTML, CSS y JavaScript
+
+El resto de este documento describe la primera versión del proyecto, que se conserva como historial.
 
 ## Sobre el proyecto
 
@@ -70,10 +86,3 @@ El acceso al panel **no está expuesto en ningún link visible del sitio** — s
 
 El usuario semilla `id: 1` (Diego Lobos Ortiz) está configurado con `tipoUsuario: "Administrador"` en `js/usuarios-data.js`, con el correo `diegolobos@gmail.com`. Al iniciar sesión con ese correo, el sistema redirige automáticamente al Dashboard del panel admin; cualquier otro correo válido ingresa como Cliente a la tienda normal.
 
-> **Nota de seguridad:** esta primera entrega no cuenta con backend, por lo que el login solo valida el **formato** del correo y el largo de la contraseña (4 a 10 caracteres) — no existe una contraseña real asociada a los usuarios administrados. Cualquier contraseña que cumpla ese formato es aceptada. Esto es una simulación suficiente para el alcance de esta evaluación (documentado también en el ERS del proyecto, sección 3.3.2 – Seguridad), y deberá reforzarse con autenticación real del lado del servidor en una etapa posterior del desarrollo.
-
-## Documentación
-
-El detalle completo de requerimientos y la especificación funcional/no funcional del sistema están en los documentos anexos del proyecto:
-- Especificación de Requisitos de Software (ERS)
-- Planilla de Requerimientos
