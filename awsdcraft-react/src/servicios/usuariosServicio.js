@@ -1,38 +1,27 @@
-import { usuariosSemilla } from "../datos/usuarios";
-import { CLAVES, guardar, iniciarColeccion, proximoId } from "./almacenamiento";
+import api from "./api";
 
-export function listarUsuarios() {
-  return iniciarColeccion(CLAVES.usuarios, usuariosSemilla);
+// Endpoints REST de /api/v1/usuarios (todos requieren rol ADMIN en el backend).
+
+export async function listarUsuarios() {
+  const { data } = await api.get("/usuarios");
+  return data;
 }
 
-export function obtenerUsuario(id) {
-  return listarUsuarios().find((usuario) => usuario.id === Number(id)) || null;
+export async function obtenerUsuario(id) {
+  const { data } = await api.get(`/usuarios/${id}`);
+  return data;
 }
 
-export function buscarPorCorreo(correo) {
-  const texto = String(correo || "").trim().toLowerCase();
-  return listarUsuarios().find((usuario) => usuario.correo.toLowerCase() === texto) || null;
+export async function crearUsuario(usuario) {
+  const { data } = await api.post("/usuarios", usuario);
+  return data;
 }
 
-export function crearUsuario(datos) {
-  const lista = listarUsuarios();
-  const nuevo = { ...datos, id: proximoId(lista) };
-  guardar(CLAVES.usuarios, [...lista, nuevo]);
-  return nuevo;
+export async function actualizarUsuario(id, usuario) {
+  const { data } = await api.put(`/usuarios/${id}`, usuario);
+  return data;
 }
 
-export function actualizarUsuario(id, datos) {
-  const lista = listarUsuarios();
-  const actualizada = lista.map((usuario) =>
-    usuario.id === Number(id) ? { ...usuario, ...datos, id: Number(id) } : usuario
-  );
-  guardar(CLAVES.usuarios, actualizada);
-  return actualizada.find((usuario) => usuario.id === Number(id)) || null;
-}
-
-export function eliminarUsuario(id) {
-  const lista = listarUsuarios();
-  const actualizada = lista.filter((usuario) => usuario.id !== Number(id));
-  guardar(CLAVES.usuarios, actualizada);
-  return actualizada;
+export async function eliminarUsuario(id) {
+  await api.delete(`/usuarios/${id}`);
 }

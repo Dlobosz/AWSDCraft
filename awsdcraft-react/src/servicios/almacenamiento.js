@@ -1,10 +1,7 @@
+// Persistencia local del carrito de compras (no es información sensible y debe sobrevivir
+// aunque el cliente cierre el navegador). Los datos del negocio viven en el backend.
 export const CLAVES = {
-  productos: "awsdcraft_productos",
-  usuarios: "awsdcraft_usuarios",
-  categorias: "awsdcraft_categorias",
-  ordenes: "awsdcraft_ordenes",
   carrito: "awsdcraft_carrito",
-  sesion: "awsdcraft_sesion",
 };
 
 export function leer(clave, valorPorDefecto) {
@@ -28,17 +25,4 @@ export function guardar(clave, valor) {
 
 export function eliminar(clave) {
   localStorage.removeItem(clave);
-}
-
-export function iniciarColeccion(clave, semilla) {
-  const actual = leer(clave, null);
-  if (actual === null) {
-    guardar(clave, semilla);
-    return [...semilla];
-  }
-  return actual;
-}
-
-export function proximoId(lista) {
-  return lista.length ? Math.max(...lista.map((item) => Number(item.id))) + 1 : 1;
 }

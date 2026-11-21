@@ -1,49 +1,55 @@
-import { CLAVES, guardar, leer, proximoId } from "./almacenamiento";
+import api from "./api";
 
-export function listarOrdenes() {
-  return leer(CLAVES.ordenes, []);
+// Endpoints REST de /api/v1/boletas (órdenes de compra).
+
+const CLAVE_ULTIMA_BOLETA = "awsdcraft_ultima_boleta";
+
+/** POST /boletas: el backend calcula precios, valida y descuenta stock. */
+export async function crearOrden(orden) {
+  const { data } = await api.post("/boletas", orden);
+  guardarUltimaBoleta(data);
+  return data;
 }
 
-export function obtenerOrden(id) {
-  return listarOrdenes().find((orden) => orden.id === Number(id)) || null;
+/** GET /boletas (ADMIN y VENDEDOR). Filtro opcional por estado. */
+export async function listarOrdenes(estado) {
+  const { data } = await api.get("/boletas", { params: estado ? { estado } : {} });
+  return data;
 }
 
-export function crearOrden(datos) {
-  const lista = listarOrdenes();
-  const id = proximoId(lista);
-  const nueva = {
-    ...datos,
-    id,
-    codigo: "ORDEN" + String(10000 + id),
-    fecha: new Date().toISOString(),
-  };
-  guardar(CLAVES.ordenes, [...lista, nueva]);
-  return nueva;
+/** GET /boletas/mis-boletas: compras del usuario autenticado. */
+export async function listarMisOrdenes() {
+  const { data } = await api.get("/boletas/mis-boletas");
+  return data;
 }
 
-export function actualizarOrden(id, datos) {
-  const lista = listarOrdenes();
-  const actualizada = lista.map((orden) =>
-    orden.id === Number(id) ? { ...orden, ...datos, id: Number(id) } : orden
-  );
-  guardar(CLAVES.ordenes, actualizada);
-  return actualizada.find((orden) => orden.id === Number(id)) || null;
+export async function obtenerOrden(id) {
+  const { data } = await api.get(`/boletas/${id}`);
+  return data;
 }
 
-export function eliminarOrden(id) {
-  const lista = listarOrdenes();
-  const actualizada = lista.filter((orden) => orden.id !== Number(id));
-  guardar(CLAVES.ordenes, actualizada);
-  return actualizada;
+/** PATCH /boletas/{id}/estado (solo ADMIN). */
+export async function cambiarEstadoOrden(id, estado) {
+  const { data } = await api.patch(`/boletas/${id}/estado`, { estado });
+  return data;
 }
 
-export function listarOrdenesDeCorreo(correo) {
-  const texto = String(correo || "").toLowerCase();
-  return listarOrdenes().filter((orden) => String(orden.correo).toLowerCase() === texto);
+/** DELETE /boletas/{id} (solo ADMIN, boletas rechazadas o anuladas). */
+export async function eliminarOrden(id) {
+  await api.delete(`/boletas/${id}`);
 }
 
-export function totalVendido() {
-  return listarOrdenes()
-    .filter((orden) => orden.estado === "Pagada")
-    .reduce((suma, orden) => suma + orden.total, 0);
+// La última boleta se recuerda en la pestaña para que la página de pago exitoso/rechazado
+// pueda recargarse aunque la compra se haya hecho como invitado.
+export function guardarUltimaBoleta(boleta) {
+  sessionStorage.setItem(CLAVE_ULTIMA_BOLETA, JSON.stringify(boleta));
+}
+
+export function leerUltimaBoleta(id) {
+  try {
+    const boleta = JSON.parse(sessionStorage.getItem(CLAVE_ULTIMA_BOLETA));
+    return boleta && String(boleta.id) === String(id) ? boleta : null;
+  } catch {
+    return null;
+  }
 }

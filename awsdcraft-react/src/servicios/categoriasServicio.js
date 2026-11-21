@@ -1,33 +1,32 @@
-import { categoriasSemilla } from "../datos/categorias";
-import { CLAVES, guardar, iniciarColeccion, proximoId } from "./almacenamiento";
+import api from "./api";
 
-export function listarCategorias() {
-  return iniciarColeccion(CLAVES.categorias, categoriasSemilla);
+// Endpoints REST de /api/v1/categorias.
+
+export async function listarCategorias() {
+  const { data } = await api.get("/categorias");
+  return data;
 }
 
-export function obtenerCategoria(slug) {
-  return listarCategorias().find((categoria) => categoria.slug === slug) || null;
+export async function obtenerCategoria(id) {
+  const { data } = await api.get(`/categorias/${id}`);
+  return data;
 }
 
-export function crearCategoria(datos) {
-  const lista = listarCategorias();
-  const nueva = { ...datos, id: proximoId(lista) };
-  guardar(CLAVES.categorias, [...lista, nueva]);
-  return nueva;
+export async function obtenerCategoriaPorSlug(slug) {
+  const { data } = await api.get(`/categorias/slug/${slug}`);
+  return data;
 }
 
-export function actualizarCategoria(id, datos) {
-  const lista = listarCategorias();
-  const actualizada = lista.map((categoria) =>
-    categoria.id === Number(id) ? { ...categoria, ...datos, id: Number(id) } : categoria
-  );
-  guardar(CLAVES.categorias, actualizada);
-  return actualizada.find((categoria) => categoria.id === Number(id)) || null;
+export async function crearCategoria(categoria) {
+  const { data } = await api.post("/categorias", categoria);
+  return data;
 }
 
-export function eliminarCategoria(id) {
-  const lista = listarCategorias();
-  const actualizada = lista.filter((categoria) => categoria.id !== Number(id));
-  guardar(CLAVES.categorias, actualizada);
-  return actualizada;
+export async function actualizarCategoria(id, categoria) {
+  const { data } = await api.put(`/categorias/${id}`, categoria);
+  return data;
+}
+
+export async function eliminarCategoria(id) {
+  await api.delete(`/categorias/${id}`);
 }

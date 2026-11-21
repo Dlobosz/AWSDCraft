@@ -1,54 +1,48 @@
-import { productos as semilla } from "../datos/productos";
-import { CLAVES, guardar, iniciarColeccion, proximoId } from "./almacenamiento";
+import api from "./api";
 
-export function listarProductos() {
-  return iniciarColeccion(CLAVES.productos, semilla);
+// Cada función corresponde a un endpoint REST de /api/v1/productos.
+
+/** GET /productos con filtros opcionales: { categoria, q, destacados, ofertas }. */
+export async function listarProductos(filtros = {}) {
+  const { data } = await api.get("/productos", { params: filtros });
+  return data;
 }
 
-export function obtenerProducto(id) {
-  return listarProductos().find((producto) => producto.id === Number(id)) || null;
+export const listarDestacados = () => listarProductos({ destacados: true });
+
+export const listarOfertas = () => listarProductos({ ofertas: true });
+
+export const listarPorCategoria = (slug) => listarProductos({ categoria: slug });
+
+/** GET /productos/criticos (solo ADMIN). */
+export async function listarCriticos() {
+  const { data } = await api.get("/productos/criticos");
+  return data;
 }
 
-export function crearProducto(datos) {
-  const lista = listarProductos();
-  const nuevo = { ...datos, id: proximoId(lista) };
-  const actualizada = [...lista, nuevo];
-  guardar(CLAVES.productos, actualizada);
-  return nuevo;
+export async function obtenerProducto(id) {
+  const { data } = await api.get(`/productos/${id}`);
+  return data;
 }
 
-export function actualizarProducto(id, datos) {
-  const lista = listarProductos();
-  const actualizada = lista.map((producto) =>
-    producto.id === Number(id) ? { ...producto, ...datos, id: Number(id) } : producto
-  );
-  guardar(CLAVES.productos, actualizada);
-  return actualizada.find((producto) => producto.id === Number(id)) || null;
+/** POST /productos (solo ADMIN). */
+export async function crearProducto(producto) {
+  const { data } = await api.post("/productos", producto);
+  return data;
 }
 
-export function eliminarProducto(id) {
-  const lista = listarProductos();
-  const actualizada = lista.filter((producto) => producto.id !== Number(id));
-  guardar(CLAVES.productos, actualizada);
-  return actualizada;
+/** PUT /productos/{id} (solo ADMIN). */
+export async function actualizarProducto(id, producto) {
+  const { data } = await api.put(`/productos/${id}`, producto);
+  return data;
 }
 
-export function listarDestacados() {
-  return listarProductos().filter((producto) => producto.destacado);
+/** DELETE /productos/{id} (solo ADMIN). */
+export async function eliminarProducto(id) {
+  await api.delete(`/productos/${id}`);
 }
 
-export function listarOfertas() {
-  return listarProductos().filter((producto) => producto.descuento > 0);
-}
-
-export function listarPorCategoria(slug) {
-  return listarProductos().filter((producto) => producto.categoria === slug);
-}
-
-export function listarCriticos() {
-  return listarProductos().filter((producto) => producto.stock <= producto.stockCritico);
-}
-
+/** Filtro local por nombre o código (no llama a la API: se aplica sobre una lista ya cargada). */
 export function buscarProductos(lista, termino) {
   const texto = String(termino || "").trim().toLowerCase();
   if (texto === "") return lista;
@@ -57,15 +51,4 @@ export function buscarProductos(lista, termino) {
       producto.nombre.toLowerCase().includes(texto) ||
       producto.codigo.toLowerCase().includes(texto)
   );
-}
-
-export function descontarStock(items) {
-  const lista = listarProductos();
-  const actualizada = lista.map((producto) => {
-    const item = items.find((linea) => linea.id === producto.id);
-    if (!item) return producto;
-    return { ...producto, stock: Math.max(0, producto.stock - item.cantidad) };
-  });
-  guardar(CLAVES.productos, actualizada);
-  return actualizada;
 }
