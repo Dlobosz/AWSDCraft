@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { listarOrdenes, totalVendido } from "../../servicios/ordenesServicio";
-import { listarCriticos, listarProductos } from "../../servicios/productosServicio";
-import { listarUsuarios } from "../../servicios/usuariosServicio";
+import EstadoCarga from "../../componentes/EstadoCarga";
+import { useCarga } from "../../hooks/useCarga";
+import { obtenerResumen } from "../../servicios/reportesServicio";
 import { formatearPrecio } from "../../utilidades/formato";
 
 const accesos = [
@@ -14,26 +14,24 @@ const accesos = [
 ];
 
 export default function Dashboard() {
-  const productos = listarProductos();
-  const usuarios = listarUsuarios();
-  const ordenes = listarOrdenes();
-  const criticos = listarCriticos();
+  // GET /api/v1/reportes/resumen: todos los indicadores en una sola petición.
+  const { datos: resumen, cargando, error } = useCarga(obtenerResumen);
 
-  const tarjetas = [
-    { titulo: "Órdenes", valor: ordenes.length, detalle: `Vendido: ${formatearPrecio(totalVendido())}` },
-    {
-      titulo: "Productos",
-      valor: productos.length,
-      detalle: `Inventario actual: ${productos.reduce((suma, p) => suma + p.stock, 0)}`,
-    },
-    { titulo: "Usuarios", valor: usuarios.length, detalle: "Cuentas registradas en el sistema" },
-    { titulo: "Stock crítico", valor: criticos.length, detalle: "Productos bajo el mínimo definido" },
-  ];
+  const tarjetas = resumen
+    ? [
+        { titulo: "Órdenes", valor: resumen.totalBoletas, detalle: `Vendido: ${formatearPrecio(resumen.totalVendido)}` },
+        { titulo: "Productos", valor: resumen.totalProductos, detalle: `Inventario actual: ${resumen.unidadesInventario}` },
+        { titulo: "Usuarios", valor: resumen.totalUsuarios, detalle: "Cuentas registradas en el sistema" },
+        { titulo: "Stock crítico", valor: resumen.productosCriticos, detalle: "Productos bajo el mínimo definido" },
+      ]
+    : [];
 
   return (
     <>
       <h1 className="awsd-title h3 mb-1">Dashboard</h1>
       <p className="text-secondary small mb-4">Resumen de las actividades diarias</p>
+
+      <EstadoCarga cargando={cargando} error={error} texto="Cargando indicadores..." />
 
       <div className="row g-3 mb-4">
         {tarjetas.map((tarjeta) => (

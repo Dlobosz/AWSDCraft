@@ -1,19 +1,25 @@
 import { Link, useParams } from "react-router-dom";
-import MensajeAlerta from "../../componentes/MensajeAlerta";
+import EstadoCarga from "../../componentes/EstadoCarga";
+import { useSesion } from "../../contexto/SesionContexto";
+import { useCarga } from "../../hooks/useCarga";
 import { obtenerProducto } from "../../servicios/productosServicio";
-import { formatearPrecio, precioConDescuento } from "../../utilidades/formato";
+import { formatearPrecio } from "../../utilidades/formato";
 
+/** Detalle de producto: lo ven ADMIN y VENDEDOR; el botón Editar solo aparece para ADMIN. */
 export default function ProductoMostrar() {
   const { id } = useParams();
-  const producto = obtenerProducto(id);
+  const { puede } = useSesion();
+  const { datos: producto, cargando, error } = useCarga(() => obtenerProducto(id), [id]);
 
-  if (!producto) {
+  if (cargando || error) {
     return (
       <>
-        <MensajeAlerta mensaje="El producto solicitado no existe." tipo="warning" />
-        <Link to="/admin/productos" className="btn btn-awsd">
-          Volver al listado
-        </Link>
+        <EstadoCarga cargando={cargando} error={error} texto="Cargando producto..." />
+        {error && (
+          <Link to="/admin/productos" className="btn btn-awsd">
+            Volver al listado
+          </Link>
+        )}
       </>
     );
   }
@@ -21,13 +27,13 @@ export default function ProductoMostrar() {
   const filas = [
     ["Código", producto.codigo],
     ["Nombre", producto.nombre],
-    ["Categoría", producto.categoria],
+    ["Categoría", producto.categoriaNombre],
     ["Precio", formatearPrecio(producto.precio)],
     ["Descuento", `${producto.descuento || 0}%`],
-    ["Precio final", formatearPrecio(precioConDescuento(producto))],
-    ["Stock", producto.stock],
+    ["Precio final", formatearPrecio(producto.precioFinal)],
+    ["Stock", producto.critico ? `${producto.stock} (crítico)` : producto.stock],
     ["Stock crítico", producto.stockCritico],
-    ["Switch", producto.switch],
+    ["Switch", producto.tipoSwitch],
     ["Destacado", producto.destacado ? "Sí" : "No"],
   ];
 
@@ -59,9 +65,11 @@ export default function ProductoMostrar() {
             <p className="text-secondary">{producto.descripcion}</p>
 
             <div className="d-flex gap-2">
-              <Link to={`/admin/productos/${producto.id}/editar`} className="btn btn-awsd">
-                Editar producto
-              </Link>
+              {puede("gestionarProductos") && (
+                <Link to={`/admin/productos/${producto.id}/editar`} className="btn btn-awsd">
+                  Editar producto
+                </Link>
+              )}
               <Link to="/admin/productos" className="btn btn-outline-secondary">
                 Volver
               </Link>

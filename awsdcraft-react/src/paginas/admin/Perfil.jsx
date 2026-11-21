@@ -1,14 +1,21 @@
-import { useSesion } from "../../contexto/SesionContexto";
-import { listarOrdenes } from "../../servicios/ordenesServicio";
+import EstadoCarga from "../../componentes/EstadoCarga";
+import { useCarga } from "../../hooks/useCarga";
+import { obtenerPerfil } from "../../servicios/authServicio";
+import { obtenerResumen } from "../../servicios/reportesServicio";
+import { etiquetaRol } from "../../utilidades/permisos";
 
 export default function Perfil() {
-  const { usuario } = useSesion();
-  const ordenes = listarOrdenes();
+  // GET /auth/perfil (datos frescos desde la BD) y GET /reportes/resumen
+  const { datos, cargando, error } = useCarga(() => Promise.all([obtenerPerfil(), obtenerResumen()]));
 
+  if (cargando || error) return <EstadoCarga cargando={cargando} error={error} />;
+
+  const [usuario, resumen] = datos;
   const filas = [
     ["Nombre", `${usuario.nombre} ${usuario.apellidos}`],
     ["Correo", usuario.correo],
-    ["Tipo de usuario", usuario.tipoUsuario],
+    ["RUN", usuario.run],
+    ["Rol", etiquetaRol(usuario.rol)],
     ["Región", usuario.region],
     ["Comuna", usuario.comuna],
     ["Dirección", usuario.direccion],
@@ -34,7 +41,7 @@ export default function Perfil() {
 
       <div className="admin-stat-card">
         <p className="text-secondary small mb-1">Órdenes gestionadas en el sistema</p>
-        <p className="stat-numero mb-0">{ordenes.length}</p>
+        <p className="stat-numero mb-0">{resumen.totalBoletas}</p>
       </div>
     </>
   );

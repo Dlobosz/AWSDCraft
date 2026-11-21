@@ -2,19 +2,28 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Boton from "../../componentes/Boton";
 import CampoTexto from "../../componentes/CampoTexto";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
 import SelectorRegionComuna from "../../componentes/SelectorRegionComuna";
-import { tiposUsuario } from "../../datos/categorias";
+import { useCarga } from "../../hooks/useCarga";
+import { erroresDeCampo, mensajeError } from "../../servicios/api";
 import { actualizarUsuario, crearUsuario, obtenerUsuario } from "../../servicios/usuariosServicio";
-import { correoPermitido, textoRequerido, validarRun } from "../../utilidades/validadores";
+import { ETIQUETAS_ROL, ROLES } from "../../utilidades/permisos";
+import {
+  correoPermitido,
+  passwordValida,
+  textoRequerido,
+  validarRun,
+} from "../../utilidades/validadores";
 
-const inicial = {
+const vacio = {
   run: "",
   nombre: "",
   apellidos: "",
   correo: "",
+  password: "",
   fechaNacimiento: "",
-  tipoUsuario: "Cliente",
+  rol: ROLES.CLIENTE,
   region: "",
   comuna: "",
   direccion: "",
@@ -22,11 +31,47 @@ const inicial = {
 
 export default function UsuarioForm() {
   const { id } = useParams();
-  const navegar = useNavigate();
-  const existente = id ? obtenerUsuario(id) : null;
+  const { datos: existente, cargando, error } = useCarga(
+    () => (id ? obtenerUsuario(id) : Promise.resolve(null)),
+    [id]
+  );
 
-  const [formulario, setFormulario] = useState(existente ? { ...existente } : inicial);
+  if (cargando || error) {
+    return (
+      <>
+        <EstadoCarga cargando={cargando} error={error} />
+        {error && (
+          <Link to="/admin/usuarios" className="btn btn-awsd">
+            Volver al listado
+          </Link>
+        )}
+      </>
+    );
+  }
+
+  const inicial = existente
+    ? {
+        ...vacio,
+        run: existente.run,
+        nombre: existente.nombre,
+        apellidos: existente.apellidos,
+        correo: existente.correo,
+        fechaNacimiento: existente.fechaNacimiento ?? "",
+        rol: existente.rol,
+        region: existente.region ?? "",
+        comuna: existente.comuna ?? "",
+        direccion: existente.direccion ?? "",
+      }
+    : vacio;
+
+  return <FormularioUsuario existente={existente} inicial={inicial} />;
+}
+
+function FormularioUsuario({ existente, inicial }) {
+  const navegar = useNavigate();
+  const [formulario, setFormulario] = useState(inicial);
   const [errores, setErrores] = useState({});
+  const [errorGeneral, setErrorGeneral] = useState("");
 
   function cambiar(campo, valor) {
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
@@ -42,6 +87,10 @@ export default function UsuarioForm() {
     if (!correoPermitido(formulario.correo)) {
       nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
     }
+    // Al crear, la contraseña es obligatoria; al editar, vacía significa "no cambiarla".
+    if ((!existente || formulario.password !== "") && !passwordValida(formulario.password)) {
+      nuevos.password = "La contraseña debe tener entre 4 y 10 caracteres.";
+    }
     if (formulario.region === "") nuevos.region = "Selecciona una región.";
     if (formulario.comuna === "") nuevos.comuna = "Selecciona una comuna.";
     if (!textoRequerido(formulario.direccion, 300)) nuevos.direccion = "Ingresa la dirección.";
@@ -50,30 +99,41 @@ export default function UsuarioForm() {
     return Object.keys(nuevos).length === 0;
   }
 
-  function enviar(evento) {
+  async function enviar(evento) {
     evento.preventDefault();
+    setErrorGeneral("");
     if (!validar()) return;
 
-    if (existente) actualizarUsuario(existente.id, formulario);
-    else crearUsuario(formulario);
+    const datos = {
+      run: formulario.run.trim().toUpperCase(),
+      nombre: formulario.nombre.trim(),
+      apellidos: formulario.apellidos.trim(),
+      correo: formulario.correo.trim(),
+      password: formulario.password || null,
+      fechaNacimiento: formulario.fechaNacimiento || null,
+      rol: formulario.rol,
+      region: formulario.region,
+      comuna: formulario.comuna,
+      direccion: formulario.direccion.trim(),
+    };
 
-    navegar("/admin/usuarios");
-  }
-
-  if (id && !existente) {
-    return (
-      <>
-        <MensajeAlerta mensaje="El usuario solicitado no existe." tipo="warning" />
-        <Link to="/admin/usuarios" className="btn btn-awsd">
-          Volver al listado
-        </Link>
-      </>
-    );
+    try {
+      if (existente) await actualizarUsuario(existente.id, datos);
+      else await crearUsuario(datos);
+      navegar("/admin/usuarios", {
+        state: { aviso: `Usuario ${datos.correo} guardado correctamente.` },
+      });
+    } catch (error) {
+      setErrores(erroresDeCampo(error));
+      setErrorGeneral(mensajeError(error, "No se pudo guardar el usuario."));
+    }
   }
 
   return (
     <>
       <h1 className="awsd-title h3 mb-4">{existente ? "Editar usuario" : "Nuevo usuario"}</h1>
+
+      <MensajeAlerta mensaje={errorGeneral} />
 
       <form onSubmit={enviar} className="awsd-card border p-4" noValidate>
         <div className="row">
@@ -82,7 +142,7 @@ export default function UsuarioForm() {
               id="run"
               etiqueta="RUN"
               requerido
-              marcaAgua="Ej: 190110229"
+              marcaAgua="Ej: 190110222"
               valor={formulario.run}
               error={errores.run}
               onChange={(valor) => cambiar("run", valor)}
@@ -126,30 +186,44 @@ export default function UsuarioForm() {
               etiqueta="Fecha de nacimiento"
               tipo="date"
               valor={formulario.fechaNacimiento}
+              error={errores.fechaNacimiento}
               onChange={(valor) => cambiar("fechaNacimiento", valor)}
             />
           </div>
           <div className="col-12 col-md-3">
             <div className="mb-3">
-              <label className="form-label" htmlFor="tipoUsuario">
-                Tipo de usuario
+              <label className="form-label" htmlFor="rol">
+                Rol
               </label>
               <select
-                id="tipoUsuario"
+                id="rol"
                 className="form-select"
-                value={formulario.tipoUsuario}
-                onChange={(evento) => cambiar("tipoUsuario", evento.target.value)}
+                value={formulario.rol}
+                onChange={(evento) => cambiar("rol", evento.target.value)}
               >
-                {tiposUsuario.map((tipo) => (
-                  <option key={tipo} value={tipo}>
-                    {tipo}
+                {Object.values(ROLES).map((rol) => (
+                  <option key={rol} value={rol}>
+                    {ETIQUETAS_ROL[rol]}
                   </option>
                 ))}
               </select>
             </div>
           </div>
 
-          <div className="col-12">
+          <div className="col-12 col-md-6">
+            <CampoTexto
+              id="password"
+              etiqueta={existente ? "Nueva contraseña (opcional)" : "Contraseña"}
+              tipo="password"
+              requerido={!existente}
+              marcaAgua={existente ? "Déjala vacía para conservar la actual" : "Entre 4 y 10 caracteres"}
+              valor={formulario.password}
+              error={errores.password}
+              onChange={(valor) => cambiar("password", valor)}
+            />
+          </div>
+
+          <div className="col-12 col-md-6">
             <CampoTexto
               id="direccion"
               etiqueta="Dirección"

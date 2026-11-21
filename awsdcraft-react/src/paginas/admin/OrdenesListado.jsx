@@ -1,14 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
+import { useCarga } from "../../hooks/useCarga";
 import { listarOrdenes } from "../../servicios/ordenesServicio";
-import { formatearFecha, formatearPrecio } from "../../utilidades/formato";
+import { ESTADOS_BOLETA, claseEstado, etiquetaEstado } from "../../utilidades/estados";
+import { formatearFechaHora, formatearPrecio } from "../../utilidades/formato";
 
+/** Visible para ADMIN y VENDEDOR. */
 export default function OrdenesListado() {
   const [estado, setEstado] = useState("todas");
-  const ordenes = listarOrdenes();
 
-  const visibles = estado === "todas" ? ordenes : ordenes.filter((orden) => orden.estado === estado);
+  // GET /api/v1/boletas?estado=... (el filtro lo resuelve el backend)
+  const { datos: ordenes, cargando, error } = useCarga(
+    () => listarOrdenes(estado === "todas" ? undefined : estado),
+    [estado]
+  );
 
   return (
     <>
@@ -23,14 +30,21 @@ export default function OrdenesListado() {
           aria-label="Filtrar por estado"
         >
           <option value="todas">Todos los estados</option>
-          <option value="Pagada">Pagadas</option>
-          <option value="Rechazada">Rechazadas</option>
+          {ESTADOS_BOLETA.map((opcion) => (
+            <option key={opcion} value={opcion}>
+              {etiquetaEstado(opcion)}
+            </option>
+          ))}
         </select>
       </div>
 
-      {visibles.length === 0 ? (
-        <MensajeAlerta mensaje="Todavía no hay órdenes registradas." tipo="info" />
-      ) : (
+      <EstadoCarga cargando={cargando} error={error} texto="Cargando órdenes..." />
+
+      {ordenes && ordenes.length === 0 && (
+        <MensajeAlerta mensaje="No hay órdenes para el filtro seleccionado." tipo="info" />
+      )}
+
+      {ordenes && ordenes.length > 0 && (
         <div className="table-responsive awsd-card border p-3">
           <table className="table admin-table align-middle mb-0">
             <thead>
@@ -45,20 +59,18 @@ export default function OrdenesListado() {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((orden) => (
+              {ordenes.map((orden) => (
                 <tr key={orden.id}>
                   <td>{orden.codigo}</td>
-                  <td>{formatearFecha(orden.fecha)}</td>
+                  <td>{formatearFechaHora(orden.fecha)}</td>
                   <td>
                     {orden.nombre} {orden.apellidos}
                   </td>
                   <td>{orden.correo}</td>
                   <td>{formatearPrecio(orden.total)}</td>
                   <td>
-                    <span
-                      className={`badge ${orden.estado === "Pagada" ? "bg-success" : "bg-danger"}`}
-                    >
-                      {orden.estado}
+                    <span className={`badge ${claseEstado(orden.estado)}`}>
+                      {etiquetaEstado(orden.estado)}
                     </span>
                   </td>
                   <td>

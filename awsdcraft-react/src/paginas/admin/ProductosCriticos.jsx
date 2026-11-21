@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
+import { useCarga } from "../../hooks/useCarga";
 import { listarCriticos } from "../../servicios/productosServicio";
 
 export default function ProductosCriticos() {
-  const criticos = listarCriticos();
+  // GET /api/v1/productos/criticos (solo ADMIN)
+  const { datos: criticos, cargando, error } = useCarga(listarCriticos);
 
   return (
     <>
@@ -12,9 +15,13 @@ export default function ProductosCriticos() {
         Productos cuyo stock actual llegó al mínimo definido.
       </p>
 
-      {criticos.length === 0 ? (
+      <EstadoCarga cargando={cargando} error={error} />
+
+      {criticos && criticos.length === 0 && (
         <MensajeAlerta mensaje="No hay productos en stock crítico." tipo="success" />
-      ) : (
+      )}
+
+      {criticos && criticos.length > 0 && (
         <div className="table-responsive awsd-card border p-3">
           <table className="table admin-table align-middle mb-0">
             <thead>

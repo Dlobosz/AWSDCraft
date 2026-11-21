@@ -1,34 +1,49 @@
 import { Link, useParams } from "react-router-dom";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
-import { listarOrdenesDeCorreo } from "../../servicios/ordenesServicio";
+import { useCarga } from "../../hooks/useCarga";
+import { listarOrdenes } from "../../servicios/ordenesServicio";
 import { obtenerUsuario } from "../../servicios/usuariosServicio";
-import { formatearFecha, formatearPrecio } from "../../utilidades/formato";
+import { claseEstado, etiquetaEstado } from "../../utilidades/estados";
+import { formatearFecha, formatearFechaHora, formatearPrecio } from "../../utilidades/formato";
+import { etiquetaRol } from "../../utilidades/permisos";
 
 export default function UsuarioMostrar() {
   const { id } = useParams();
-  const usuario = obtenerUsuario(id);
+  // GET /usuarios/{id} y GET /boletas en paralelo; el historial se filtra por usuario o correo.
+  const { datos, cargando, error } = useCarga(
+    () => Promise.all([obtenerUsuario(id), listarOrdenes()]),
+    [id]
+  );
 
-  if (!usuario) {
+  if (cargando || error) {
     return (
       <>
-        <MensajeAlerta mensaje="El usuario solicitado no existe." tipo="warning" />
-        <Link to="/admin/usuarios" className="btn btn-awsd">
-          Volver al listado
-        </Link>
+        <EstadoCarga cargando={cargando} error={error} />
+        {error && (
+          <Link to="/admin/usuarios" className="btn btn-awsd">
+            Volver al listado
+          </Link>
+        )}
       </>
     );
   }
 
-  const compras = listarOrdenesDeCorreo(usuario.correo);
+  const [usuario, ordenes] = datos;
+  const compras = ordenes.filter(
+    (orden) => orden.usuarioId === usuario.id || orden.correo === usuario.correo.toLowerCase()
+  );
 
   const filas = [
     ["RUN", usuario.run],
     ["Nombre", `${usuario.nombre} ${usuario.apellidos}`],
     ["Correo", usuario.correo],
-    ["Tipo de usuario", usuario.tipoUsuario],
-    ["Región", usuario.region],
-    ["Comuna", usuario.comuna],
-    ["Dirección", usuario.direccion],
+    ["Rol", etiquetaRol(usuario.rol)],
+    ["Fecha de nacimiento", formatearFecha(usuario.fechaNacimiento) || "-"],
+    ["Región", usuario.region || "-"],
+    ["Comuna", usuario.comuna || "-"],
+    ["Dirección", usuario.direccion || "-"],
+    ["Registrado el", formatearFechaHora(usuario.fechaRegistro)],
   ];
 
   return (
@@ -66,22 +81,26 @@ export default function UsuarioMostrar() {
           <table className="table admin-table align-middle mb-0">
             <thead>
               <tr>
-                <th>Orden</th>
+                <th>Boleta</th>
                 <th>Fecha</th>
                 <th>Productos</th>
                 <th>Total</th>
                 <th>Estado</th>
-                <th>Boleta</th>
+                <th>Detalle</th>
               </tr>
             </thead>
             <tbody>
               {compras.map((orden) => (
                 <tr key={orden.id}>
                   <td>{orden.codigo}</td>
-                  <td>{formatearFecha(orden.fecha)}</td>
+                  <td>{formatearFechaHora(orden.fecha)}</td>
                   <td>{orden.items.length}</td>
                   <td>{formatearPrecio(orden.total)}</td>
-                  <td>{orden.estado}</td>
+                  <td>
+                    <span className={`badge ${claseEstado(orden.estado)}`}>
+                      {etiquetaEstado(orden.estado)}
+                    </span>
+                  </td>
                   <td>
                     <Link to={`/admin/ordenes/${orden.id}`} className="btn btn-sm btn-outline-awsd">
                       Ver

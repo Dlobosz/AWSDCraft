@@ -2,23 +2,56 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Boton from "../../componentes/Boton";
 import CampoTexto from "../../componentes/CampoTexto";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
+import { useCarga } from "../../hooks/useCarga";
+import { erroresDeCampo, mensajeError } from "../../servicios/api";
 import {
   actualizarCategoria,
   crearCategoria,
-  listarCategorias,
+  obtenerCategoria,
 } from "../../servicios/categoriasServicio";
 import { textoRequerido } from "../../utilidades/validadores";
 
-const inicial = { nombre: "", slug: "", descripcion: "", imagen: "teclado-87.webp" };
+const vacio = { nombre: "", slug: "", descripcion: "", imagen: "teclado-87.webp" };
 
 export default function CategoriaForm() {
   const { id } = useParams();
-  const navegar = useNavigate();
-  const existente = id ? listarCategorias().find((item) => item.id === Number(id)) : null;
+  const { datos: existente, cargando, error } = useCarga(
+    () => (id ? obtenerCategoria(id) : Promise.resolve(null)),
+    [id]
+  );
 
-  const [formulario, setFormulario] = useState(existente ? { ...existente } : inicial);
+  if (cargando || error) {
+    return (
+      <>
+        <EstadoCarga cargando={cargando} error={error} />
+        {error && (
+          <Link to="/admin/categorias" className="btn btn-awsd">
+            Volver al listado
+          </Link>
+        )}
+      </>
+    );
+  }
+
+  const inicial = existente
+    ? {
+        nombre: existente.nombre,
+        slug: existente.slug,
+        descripcion: existente.descripcion ?? "",
+        imagen: existente.imagen ?? "",
+      }
+    : vacio;
+
+  return <FormularioCategoria existente={existente} inicial={inicial} />;
+}
+
+function FormularioCategoria({ existente, inicial }) {
+  const navegar = useNavigate();
+  const [formulario, setFormulario] = useState(inicial);
   const [errores, setErrores] = useState({});
+  const [errorGeneral, setErrorGeneral] = useState("");
 
   function cambiar(campo, valor) {
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
@@ -27,10 +60,10 @@ export default function CategoriaForm() {
   function validar() {
     const nuevos = {};
     if (!textoRequerido(formulario.nombre, 60)) nuevos.nombre = "Ingresa el nombre.";
-    if (!/^[a-z0-9-]+$/.test(formulario.slug)) {
-      nuevos.slug = "Usa solo minúsculas, números o guiones.";
+    if (formulario.slug && !/^[a-z0-9-]+$/.test(formulario.slug)) {
+      nuevos.slug = "Usa solo minúsculas, números o guiones (o déjalo vacío para generarlo).";
     }
-    if (!textoRequerido(formulario.descripcion, 200)) {
+    if (!textoRequerido(formulario.descripcion, 255)) {
       nuevos.descripcion = "Ingresa una descripción.";
     }
 
@@ -38,30 +71,28 @@ export default function CategoriaForm() {
     return Object.keys(nuevos).length === 0;
   }
 
-  function enviar(evento) {
+  async function enviar(evento) {
     evento.preventDefault();
+    setErrorGeneral("");
     if (!validar()) return;
 
-    if (existente) actualizarCategoria(existente.id, formulario);
-    else crearCategoria(formulario);
-
-    navegar("/admin/categorias");
-  }
-
-  if (id && !existente) {
-    return (
-      <>
-        <MensajeAlerta mensaje="La categoría solicitada no existe." tipo="warning" />
-        <Link to="/admin/categorias" className="btn btn-awsd">
-          Volver al listado
-        </Link>
-      </>
-    );
+    try {
+      if (existente) await actualizarCategoria(existente.id, formulario);
+      else await crearCategoria(formulario);
+      navegar("/admin/categorias", {
+        state: { aviso: `Categoría "${formulario.nombre}" guardada correctamente.` },
+      });
+    } catch (error) {
+      setErrores(erroresDeCampo(error));
+      setErrorGeneral(mensajeError(error, "No se pudo guardar la categoría."));
+    }
   }
 
   return (
     <>
       <h1 className="awsd-title h3 mb-4">{existente ? "Editar categoría" : "Nueva categoría"}</h1>
+
+      <MensajeAlerta mensaje={errorGeneral} />
 
       <form onSubmit={enviar} className="awsd-card border p-4" noValidate>
         <div className="row">
@@ -78,9 +109,8 @@ export default function CategoriaForm() {
           <div className="col-12 col-md-6">
             <CampoTexto
               id="slug"
-              etiqueta="Identificador"
-              requerido
-              marcaAgua="Ej: teclados"
+              etiqueta="Identificador (opcional)"
+              marcaAgua="Ej: teclados (se genera desde el nombre)"
               valor={formulario.slug}
               error={errores.slug}
               onChange={(valor) => cambiar("slug", valor.toLowerCase())}
