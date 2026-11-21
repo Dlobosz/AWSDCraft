@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Boton from "../../componentes/Boton";
 import ControlCantidad from "../../componentes/ControlCantidad";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
 import { useCarrito } from "../../contexto/CarritoContexto";
+import { useCarga } from "../../hooks/useCarga";
 import { obtenerProducto } from "../../servicios/productosServicio";
 import { formatearPrecio, precioConDescuento } from "../../utilidades/formato";
 
@@ -13,7 +15,16 @@ export default function DetalleProducto() {
   const [cantidad, setCantidad] = useState(1);
   const [aviso, setAviso] = useState("");
 
-  const producto = obtenerProducto(id);
+  // GET /api/v1/productos/{id}
+  const { datos: producto, cargando, error, estadoHttp } = useCarga(() => obtenerProducto(id), [id]);
+
+  if (cargando || (error && estadoHttp !== 404)) {
+    return (
+      <section className="container py-5">
+        <EstadoCarga cargando={cargando} error={error} texto="Cargando producto..." />
+      </section>
+    );
+  }
 
   if (!producto) {
     return (
@@ -52,7 +63,7 @@ export default function DetalleProducto() {
         </div>
 
         <div className="col-12 col-lg-6">
-          <span className="section-kicker">{producto.categoria}</span>
+          <span className="section-kicker">{producto.categoriaNombre}</span>
           <h1 className="awsd-title mb-2">{producto.nombre}</h1>
           <p className="text-secondary">Código {producto.codigo}</p>
 
@@ -69,7 +80,7 @@ export default function DetalleProducto() {
 
           <ul className="list-unstyled small text-secondary mb-4">
             <li>
-              <strong>Switch:</strong> {producto.switch}
+              <strong>Switch:</strong> {producto.tipoSwitch}
             </li>
             <li>
               <strong>Stock:</strong> {producto.stock} unidades

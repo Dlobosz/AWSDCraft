@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import BuscadorProductos from "../../componentes/BuscadorProductos";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import FiltroCategorias from "../../componentes/FiltroCategorias";
 import ListaProductos from "../../componentes/ListaProductos";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
 import { useCarrito } from "../../contexto/CarritoContexto";
+import { useCarga } from "../../hooks/useCarga";
 import { listarCategorias } from "../../servicios/categoriasServicio";
 import { buscarProductos, listarProductos } from "../../servicios/productosServicio";
 
@@ -14,16 +16,19 @@ export default function Productos() {
   const [orden, setOrden] = useState("nombre");
   const [aviso, setAviso] = useState("");
 
-  const categorias = listarCategorias();
-  const todos = listarProductos();
+  // Se cargan una vez desde la API (en paralelo) y luego se filtran/ordenan en el navegador.
+  const { datos, cargando, error } = useCarga(() =>
+    Promise.all([listarProductos(), listarCategorias()])
+  );
+  const [todos, categorias] = datos ?? [[], []];
 
   const visibles = useMemo(() => {
     let resultado = categoria === "todas" ? todos : todos.filter((p) => p.categoria === categoria);
     resultado = buscarProductos(resultado, termino);
 
     return [...resultado].sort((a, b) => {
-      if (orden === "precio-asc") return a.precio - b.precio;
-      if (orden === "precio-desc") return b.precio - a.precio;
+      if (orden === "precio-asc") return a.precioFinal - b.precioFinal;
+      if (orden === "precio-desc") return b.precioFinal - a.precioFinal;
       return a.nombre.localeCompare(b.nombre);
     });
   }, [todos, categoria, termino, orden]);
@@ -64,12 +69,17 @@ export default function Productos() {
       </div>
 
       <MensajeAlerta mensaje={aviso} tipo="success" />
-      <p className="text-secondary small">{visibles.length} productos encontrados</p>
-      <ListaProductos
-        productos={visibles}
-        onAgregar={agregarProducto}
-        mensajeVacio="No encontramos productos con ese filtro."
-      />
+      <EstadoCarga cargando={cargando} error={error} texto="Cargando catálogo..." />
+      {datos && (
+        <>
+          <p className="text-secondary small">{visibles.length} productos encontrados</p>
+          <ListaProductos
+            productos={visibles}
+            onAgregar={agregarProducto}
+            mensajeVacio="No encontramos productos con ese filtro."
+          />
+        </>
+      )}
     </section>
   );
 }

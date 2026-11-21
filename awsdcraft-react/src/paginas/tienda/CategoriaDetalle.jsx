@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import ListaProductos from "../../componentes/ListaProductos";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
 import { useCarrito } from "../../contexto/CarritoContexto";
-import { listarCategorias, obtenerCategoria } from "../../servicios/categoriasServicio";
+import { useCarga } from "../../hooks/useCarga";
+import { listarCategorias } from "../../servicios/categoriasServicio";
 import { listarPorCategoria } from "../../servicios/productosServicio";
 
 export default function CategoriaDetalle() {
@@ -11,9 +13,13 @@ export default function CategoriaDetalle() {
   const { agregar } = useCarrito();
   const [aviso, setAviso] = useState("");
 
-  const categoria = obtenerCategoria(slug);
-  const categorias = listarCategorias();
-  const productos = listarPorCategoria(slug);
+  // GET /api/v1/categorias y GET /api/v1/productos?categoria={slug} en paralelo
+  const { datos, cargando, error } = useCarga(
+    () => Promise.all([listarCategorias(), listarPorCategoria(slug)]),
+    [slug]
+  );
+  const [categorias, productos] = datos ?? [[], []];
+  const categoria = categorias.find((item) => item.slug === slug);
 
   function agregarProducto(producto) {
     agregar(producto, 1);
@@ -34,7 +40,8 @@ export default function CategoriaDetalle() {
         ))}
       </div>
 
-      {categoria ? (
+      <EstadoCarga cargando={cargando} error={error} />
+      {!datos ? null : categoria ? (
         <>
           <span className="section-kicker">Categoría</span>
           <h1 className="awsd-title mb-2">{categoria.nombre}</h1>

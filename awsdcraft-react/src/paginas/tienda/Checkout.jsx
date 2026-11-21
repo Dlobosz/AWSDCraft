@@ -7,8 +7,8 @@ import SelectorRegionComuna from "../../componentes/SelectorRegionComuna";
 import TablaCarrito from "../../componentes/TablaCarrito";
 import { useCarrito } from "../../contexto/CarritoContexto";
 import { useSesion } from "../../contexto/SesionContexto";
+import { erroresDeCampo, mensajeError } from "../../servicios/api";
 import { crearOrden } from "../../servicios/ordenesServicio";
-import { descontarStock } from "../../servicios/productosServicio";
 import { formatearPrecio } from "../../utilidades/formato";
 import { correoPermitido, textoRequerido } from "../../utilidades/validadores";
 
@@ -17,18 +17,21 @@ export default function Checkout() {
   const { usuario } = useSesion();
   const navegar = useNavigate();
 
+  // Si hay sesión iniciada, el formulario se completa con los datos del perfil.
   const [formulario, setFormulario] = useState({
-    nombre: usuario ? usuario.nombre : "",
-    apellidos: usuario ? usuario.apellidos : "",
-    correo: usuario ? usuario.correo : "",
-    calle: usuario ? usuario.direccion : "",
+    nombre: usuario?.nombre ?? "",
+    apellidos: usuario?.apellidos ?? "",
+    correo: usuario?.correo ?? "",
+    calle: usuario?.direccion ?? "",
     departamento: "",
-    region: usuario ? usuario.region : "",
-    comuna: usuario ? usuario.comuna : "",
+    region: usuario?.region ?? "",
+    comuna: usuario?.comuna ?? "",
     indicaciones: "",
     metodoPago: "credito",
   });
   const [errores, setErrores] = useState({});
+  const [errorGeneral, setErrorGeneral] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
   if (items.length === 0) return <Navigate to="/carrito" replace />;
 
@@ -51,25 +54,40 @@ export default function Checkout() {
     return Object.keys(nuevos).length === 0;
   }
 
-  function pagar(evento) {
+  async function pagar(evento) {
     evento.preventDefault();
+    setErrorGeneral("");
     if (!validar()) return;
 
-    const pagoAprobado = formulario.metodoPago !== "rechazada";
+    setEnviando(true);
+    try {
+      // POST /api/v1/boletas: solo se envían productos y cantidades. El backend toma el precio
+      // vigente de la BD, valida el stock, lo descuenta y responde la boleta creada.
+      const boleta = await crearOrden({
+        nombre: formulario.nombre.trim(),
+        apellidos: formulario.apellidos.trim(),
+        correo: formulario.correo.trim(),
+        calle: formulario.calle.trim(),
+        departamento: formulario.departamento.trim() || null,
+        region: formulario.region,
+        comuna: formulario.comuna,
+        indicaciones: formulario.indicaciones.trim() || null,
+        metodoPago: formulario.metodoPago,
+        items: items.map((item) => ({ productoId: item.id, cantidad: item.cantidad })),
+      });
 
-    const orden = crearOrden({
-      ...formulario,
-      items,
-      total,
-      estado: pagoAprobado ? "Pagada" : "Rechazada",
-    });
-
-    if (pagoAprobado) {
-      descontarStock(items);
-      vaciar();
-      navegar(`/pago-exitoso/${orden.id}`);
-    } else {
-      navegar(`/pago-error/${orden.id}`);
+      if (boleta.estado === "PAGADA") {
+        navegar(`/pago-exitoso/${boleta.id}`, { state: { boleta } });
+        vaciar();
+      } else {
+        navegar(`/pago-error/${boleta.id}`, { state: { boleta } });
+      }
+    } catch (error) {
+      // Ej.: 409 "Stock insuficiente..." o 400 con errores por campo.
+      setErrores(erroresDeCampo(error));
+      setErrorGeneral(mensajeError(error, "No se pudo procesar la compra."));
+    } finally {
+      setEnviando(false);
     }
   }
 
@@ -185,14 +203,20 @@ export default function Checkout() {
                 </select>
               </div>
 
-              {Object.keys(errores).length > 0 && (
+              {(errorGeneral || Object.keys(errores).length > 0) && (
                 <div className="mt-3">
-                  <MensajeAlerta mensaje="Revisa los campos marcados antes de continuar." />
+                  <MensajeAlerta
+                    mensaje={errorGeneral || "Revisa los campos marcados antes de continuar."}
+                  />
                 </div>
               )}
 
               <div className="d-flex justify-content-end mt-4">
-                <Boton tipo="submit" etiqueta={`Pagar ahora ${formatearPrecio(total)}`} />
+                <Boton
+                  tipo="submit"
+                  etiqueta={enviando ? "Procesando pago..." : `Pagar ahora ${formatearPrecio(total)}`}
+                  deshabilitado={enviando}
+                />
               </div>
             </form>
           </div>

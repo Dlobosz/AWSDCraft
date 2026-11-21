@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import EstadoCarga from "../../componentes/EstadoCarga";
 import ListaProductos from "../../componentes/ListaProductos";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
 import { useCarrito } from "../../contexto/CarritoContexto";
+import { useCarga } from "../../hooks/useCarga";
 import { listarDestacados } from "../../servicios/productosServicio";
 
 const beneficios = [
@@ -14,7 +16,8 @@ const beneficios = [
 export default function Home() {
   const { agregar } = useCarrito();
   const [aviso, setAviso] = useState("");
-  const destacados = listarDestacados();
+  // GET /api/v1/productos?destacados=true
+  const { datos: destacados, cargando, error } = useCarga(listarDestacados);
 
   function agregarProducto(producto) {
     agregar(producto, 1);
@@ -75,7 +78,8 @@ export default function Home() {
         </div>
 
         <MensajeAlerta mensaje={aviso} tipo="success" />
-        <ListaProductos productos={destacados} onAgregar={agregarProducto} />
+        <EstadoCarga cargando={cargando} error={error} texto="Cargando productos destacados..." />
+        {destacados && <ListaProductos productos={destacados} onAgregar={agregarProducto} />}
       </section>
     </>
   );

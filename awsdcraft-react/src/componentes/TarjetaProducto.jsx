@@ -18,7 +18,7 @@ export default function TarjetaProducto({ producto, onAgregar }) {
           </span>
         )}
         <h3 className="h6 mb-1">{producto.nombre}</h3>
-        <p className="small text-secondary mb-2">{producto.switch}</p>
+        <p className="small text-secondary mb-2">{producto.tipoSwitch}</p>
         <p className="product-price mb-1">
           {formatearPrecio(precioFinal)}
           {producto.descuento > 0 && (
