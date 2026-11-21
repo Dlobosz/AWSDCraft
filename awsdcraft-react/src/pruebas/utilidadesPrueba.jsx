@@ -42,3 +42,30 @@ export function escribir(campo, valor) {
     campo.dispatchEvent(new Event("input", { bubbles: true }));
   });
 }
+
+/** Deja que se resuelvan las promesas pendientes (respuestas simuladas de la API). */
+export async function esperar(ms = 0) {
+  await act(async () => {
+    await new Promise((resolver) => setTimeout(resolver, ms));
+  });
+}
+
+/** Monta un elemento dentro de un router que parte en la ruta indicada. */
+export function montarEnRuta(elemento, ruta = "/") {
+  const contenedor = document.createElement("div");
+  document.body.appendChild(contenedor);
+  const raiz = createRoot(contenedor);
+
+  act(() => {
+    raiz.render(<MemoryRouter initialEntries={[ruta]}>{elemento}</MemoryRouter>);
+  });
+
+  return {
+    contenedor,
+    texto: () => contenedor.textContent,
+    desmontar: () => {
+      act(() => raiz.unmount());
+      contenedor.remove();
+    },
+  };
+}
