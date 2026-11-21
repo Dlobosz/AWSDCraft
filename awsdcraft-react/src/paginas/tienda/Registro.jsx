@@ -4,7 +4,8 @@ import Boton from "../../componentes/Boton";
 import CampoTexto from "../../componentes/CampoTexto";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
 import SelectorRegionComuna from "../../componentes/SelectorRegionComuna";
-import { crearUsuario } from "../../servicios/usuariosServicio";
+import { useSesion } from "../../contexto/SesionContexto";
+import { erroresDeCampo, mensajeError } from "../../servicios/api";
 import {
   correoPermitido,
   passwordValida,
@@ -26,15 +27,19 @@ const inicial = {
 };
 
 export default function Registro() {
+  const { registrar } = useSesion();
   const navegar = useNavigate();
   const [formulario, setFormulario] = useState(inicial);
   const [errores, setErrores] = useState({});
   const [exito, setExito] = useState("");
+  const [errorGeneral, setErrorGeneral] = useState("");
+  const [enviando, setEnviando] = useState(false);
 
   function cambiar(campo, valor) {
     setFormulario((actual) => ({ ...actual, [campo]: valor }));
   }
 
+  // Validación en el navegador para dar respuesta inmediata; el backend vuelve a validar todo.
   function validar() {
     const nuevos = {};
     if (!validarRun(formulario.run)) nuevos.run = "RUN inválido, ingrésalo sin puntos ni guion.";
@@ -59,28 +64,37 @@ export default function Registro() {
     return Object.keys(nuevos).length === 0;
   }
 
-  function enviar(evento) {
+  async function enviar(evento) {
     evento.preventDefault();
+    setErrorGeneral("");
     if (!validar()) {
       setExito("");
       return;
     }
 
-    crearUsuario({
-      run: formulario.run.trim().toUpperCase(),
-      nombre: formulario.nombre.trim(),
-      apellidos: formulario.apellidos.trim(),
-      correo: formulario.correo.trim(),
-      fechaNacimiento: formulario.fechaNacimiento,
-      tipoUsuario: "Cliente",
-      region: formulario.region,
-      comuna: formulario.comuna,
-      direccion: formulario.direccion.trim(),
-    });
-
-    setExito("Cuenta creada correctamente. Te llevaremos al inicio de sesión.");
-    setFormulario(inicial);
-    setTimeout(() => navegar("/login"), 1800);
+    setEnviando(true);
+    try {
+      // POST /api/v1/auth/registro: crea la cuenta con rol CLIENTE e inicia sesión.
+      await registrar({
+        run: formulario.run.trim().toUpperCase(),
+        nombre: formulario.nombre.trim(),
+        apellidos: formulario.apellidos.trim(),
+        correo: formulario.correo.trim(),
+        password: formulario.password,
+        fechaNacimiento: formulario.fechaNacimiento || null,
+        region: formulario.region,
+        comuna: formulario.comuna,
+        direccion: formulario.direccion.trim(),
+      });
+      setExito("Cuenta creada correctamente. ¡Ya iniciaste sesión! Te llevaremos a la tienda.");
+      setFormulario(inicial);
+      setTimeout(() => navegar("/"), 1500);
+    } catch (error) {
+      setErrores((actuales) => ({ ...actuales, ...erroresDeCampo(error) }));
+      setErrorGeneral(mensajeError(error, "No se pudo crear la cuenta."));
+    } finally {
+      setEnviando(false);
+    }
   }
 
   return (
@@ -92,6 +106,7 @@ export default function Registro() {
             <h1 className="awsd-title h3 mb-4">Registro de usuario</h1>
 
             <MensajeAlerta mensaje={exito} tipo="success" />
+            <MensajeAlerta mensaje={errorGeneral} />
 
             <form onSubmit={enviar} noValidate>
               <div className="row">
@@ -100,7 +115,7 @@ export default function Registro() {
                     id="run"
                     etiqueta="RUN"
                     requerido
-                    marcaAgua="Ej: 190110229"
+                    marcaAgua="Ej: 190110222"
                     valor={formulario.run}
                     error={errores.run}
                     onChange={(valor) => cambiar("run", valor)}
@@ -112,6 +127,7 @@ export default function Registro() {
                     etiqueta="Fecha de nacimiento"
                     tipo="date"
                     valor={formulario.fechaNacimiento}
+                    error={errores.fechaNacimiento}
                     onChange={(valor) => cambiar("fechaNacimiento", valor)}
                   />
                 </div>
@@ -191,7 +207,12 @@ export default function Registro() {
                 </div>
               </div>
 
-              <Boton tipo="submit" etiqueta="Crear cuenta" className="w-100 mt-2" />
+              <Boton
+                tipo="submit"
+                etiqueta={enviando ? "Creando cuenta..." : "Crear cuenta"}
+                deshabilitado={enviando}
+                className="w-100 mt-2"
+              />
             </form>
           </div>
         </div>

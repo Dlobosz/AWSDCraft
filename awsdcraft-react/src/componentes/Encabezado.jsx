@@ -1,14 +1,15 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCarrito } from "../contexto/CarritoContexto";
 import { useSesion } from "../contexto/SesionContexto";
+import { etiquetaRol, rutaInicial } from "../utilidades/permisos";
 
 export default function Encabezado() {
   const { cantidadTotal } = useCarrito();
-  const { usuario, esAdministrador, cerrarSesion } = useSesion();
+  const { usuario, esPersonal, cerrarSesion } = useSesion();
   const navegar = useNavigate();
 
-  function salir() {
-    cerrarSesion();
+  async function salir() {
+    await cerrarSesion();
     navegar("/");
   }
 
@@ -73,9 +74,10 @@ export default function Encabezado() {
                 </NavLink>
               </li>
 
-              {esAdministrador && (
+              {/* Solo ADMIN y VENDEDOR ven el acceso al panel; el CLIENTE nunca lo ve. */}
+              {esPersonal && (
                 <li className="nav-item">
-                  <NavLink className="nav-link" to="/admin">
+                  <NavLink className="nav-link" to={rutaInicial(usuario)}>
                     Administración
                   </NavLink>
                 </li>
@@ -84,7 +86,15 @@ export default function Encabezado() {
               {usuario ? (
                 <>
                   <li className="nav-item">
-                    <span className="nav-link">Hola, {usuario.nombre}</span>
+                    <NavLink className="nav-link" to="/mis-compras">
+                      Mis compras
+                    </NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <span className="nav-link">
+                      Hola, {usuario.nombre}{" "}
+                      <span className="badge text-bg-light border">{etiquetaRol(usuario.rol)}</span>
+                    </span>
                   </li>
                   <li className="nav-item">
                     <button className="btn btn-outline-awsd btn-sm" onClick={salir}>
