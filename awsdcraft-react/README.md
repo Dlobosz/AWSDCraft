@@ -18,7 +18,8 @@ npm run dev                 # http://localhost:5173
 ```
 
 ```powershell
-npm test                    # pruebas Jasmine + Karma (reporte de cobertura en coverage/)
+npm test                    # pruebas con Vitest + Testing Library
+npm run test:coverage       # informe de cobertura en coverage/
 npm run build               # versión de producción en dist/
 ```
 
@@ -95,4 +96,4 @@ El frontend oculta lo que el rol no puede usar, pero **la seguridad real está e
 | `src/servicios` | Cliente axios, sesión y servicios REST por entidad |
 | `src/datos` | Datos estáticos que no viven en el backend (blogs, regiones y comunas) |
 | `src/utilidades` | Validaciones, formato, permisos por rol y estados de boleta |
-| `src/pruebas` | Especificaciones Jasmine (52 pruebas) |
+| `src/pruebas` | Pruebas Vitest + Testing Library (73 pruebas): componentes, servicios REST con axios simulado, sesión, permisos, rutas protegidas y formulario de productos |

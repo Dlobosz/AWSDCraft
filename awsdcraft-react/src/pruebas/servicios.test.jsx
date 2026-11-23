@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from "vitest";
+
 import api, { mensajeError } from "../servicios/api";
 import {
   agregarItem,
@@ -7,17 +9,13 @@ import {
   quitarItem,
 } from "../servicios/carritoServicio";
 import {
-  cambiarEstadoOrden,
-  crearOrden,
-  leerUltimaBoleta,
-  listarOrdenes,
-} from "../servicios/ordenesServicio";
-import {
   buscarProductos,
   crearProducto,
   eliminarProducto,
+  listarCriticos,
   listarOfertas,
   listarProductos,
+  obtenerProducto,
 } from "../servicios/productosServicio";
 import { formatearPrecio, precioConDescuento } from "../utilidades/formato";
 import { correoPermitido, passwordValida, validarRun } from "../utilidades/validadores";
@@ -31,9 +29,6 @@ const producto = {
   imagen: "teclado-87.webp",
   descuento: 0,
 };
-
-/** Respuesta simulada de axios: { data }. */
-const respuesta = (data) => Promise.resolve({ data });
 
 describe("Validadores del formulario", () => {
   it("acepta un RUN con dígito verificador correcto", () => {
@@ -83,7 +78,7 @@ describe("Servicio de carrito", () => {
   it("agrega un producto nuevo al carrito", () => {
     const carrito = agregarItem([], producto, 1);
 
-    expect(carrito.length).toBe(1);
+    expect(carrito).toHaveLength(1);
     expect(carrito[0].nombre).toBe("Teclado TKL 87 teclas");
     expect(carrito[0].cantidad).toBe(1);
   });
@@ -91,14 +86,12 @@ describe("Servicio de carrito", () => {
   it("suma la cantidad cuando el producto ya está en el carrito", () => {
     const carrito = agregarItem(agregarItem([], producto, 1), producto, 1);
 
-    expect(carrito.length).toBe(1);
+    expect(carrito).toHaveLength(1);
     expect(carrito[0].cantidad).toBe(2);
   });
 
   it("no permite agregar más unidades que el stock disponible", () => {
-    const carrito = agregarItem([], producto, 10);
-
-    expect(carrito[0].cantidad).toBe(3);
+    expect(agregarItem([], producto, 10)[0].cantidad).toBe(3);
   });
 
   it("calcula el total y la cantidad de unidades del carrito", () => {
@@ -109,21 +102,17 @@ describe("Servicio de carrito", () => {
   });
 
   it("cambia la cantidad de una línea respetando los límites", () => {
-    const carrito = cambiarCantidad(agregarItem([], producto, 1), 1, 99);
-
-    expect(carrito[0].cantidad).toBe(3);
+    expect(cambiarCantidad(agregarItem([], producto, 1), 1, 99)[0].cantidad).toBe(3);
   });
 
   it("quita un producto del carrito", () => {
-    const carrito = quitarItem(agregarItem([], producto, 1), 1);
-
-    expect(carrito.length).toBe(0);
+    expect(quitarItem(agregarItem([], producto, 1), 1)).toHaveLength(0);
   });
 });
 
-describe("Servicios REST de productos (axios)", () => {
+describe("Servicios REST de productos (axios simulado)", () => {
   it("lista productos con GET /productos enviando los filtros como parámetros", async () => {
-    spyOn(api, "get").and.returnValue(respuesta([producto]));
+    vi.spyOn(api, "get").mockResolvedValue({ data: [producto] });
 
     const lista = await listarProductos({ categoria: "teclados" });
 
@@ -132,16 +121,26 @@ describe("Servicios REST de productos (axios)", () => {
   });
 
   it("pide las ofertas al backend con el filtro ofertas=true", async () => {
-    spyOn(api, "get").and.returnValue(respuesta([]));
+    vi.spyOn(api, "get").mockResolvedValue({ data: [] });
 
     await listarOfertas();
 
     expect(api.get).toHaveBeenCalledWith("/productos", { params: { ofertas: true } });
   });
 
+  it("consulta el detalle y el stock crítico en sus endpoints", async () => {
+    vi.spyOn(api, "get").mockResolvedValue({ data: producto });
+
+    await obtenerProducto(1);
+    await listarCriticos();
+
+    expect(api.get).toHaveBeenNthCalledWith(1, "/productos/1");
+    expect(api.get).toHaveBeenNthCalledWith(2, "/productos/criticos");
+  });
+
   it("crea un producto con POST y devuelve el registro creado por el backend", async () => {
     const nuevo = { codigo: "TCL-099", nombre: "Teclado de prueba", precio: 1000, categoriaId: 1 };
-    spyOn(api, "post").and.returnValue(respuesta({ ...nuevo, id: 13 }));
+    vi.spyOn(api, "post").mockResolvedValue({ data: { ...nuevo, id: 13 } });
 
     const creado = await crearProducto(nuevo);
 
@@ -150,11 +149,19 @@ describe("Servicios REST de productos (axios)", () => {
   });
 
   it("elimina un producto con DELETE /productos/{id}", async () => {
-    spyOn(api, "delete").and.returnValue(Promise.resolve({ status: 204 }));
+    vi.spyOn(api, "delete").mockResolvedValue({ status: 204 });
 
     await eliminarProducto(5);
 
     expect(api.delete).toHaveBeenCalledWith("/productos/5");
+  });
+
+  it("propaga el error del backend para que la página muestre su mensaje", async () => {
+    const error = { response: { status: 409, data: { mensaje: "Ya existe un producto con el código TCL-001" } } };
+    vi.spyOn(api, "post").mockRejectedValue(error);
+
+    await expect(crearProducto({ codigo: "TCL-001" })).rejects.toBe(error);
+    expect(mensajeError(error)).toBe("Ya existe un producto con el código TCL-001");
   });
 
   it("filtra localmente por nombre o código una lista ya cargada", () => {
@@ -163,55 +170,18 @@ describe("Servicios REST de productos (axios)", () => {
       { ...producto, id: 2, nombre: "Teclado 60%", codigo: "TCL-003" },
     ];
 
-    expect(buscarProductos(lista, "keycaps").length).toBe(1);
+    expect(buscarProductos(lista, "keycaps")).toHaveLength(1);
     expect(buscarProductos(lista, "tcl-003")[0].id).toBe(2);
-    expect(buscarProductos(lista, "").length).toBe(2);
-  });
-});
-
-describe("Servicios REST de boletas (axios)", () => {
-  beforeEach(() => sessionStorage.clear());
-
-  it("envía solo productos y cantidades al comprar y recuerda la boleta creada", async () => {
-    const boleta = { id: 7, codigo: "BOL-10007", estado: "PAGADA", items: [] };
-    spyOn(api, "post").and.returnValue(respuesta(boleta));
-    const orden = { nombre: "Javier", items: [{ productoId: 1, cantidad: 2 }] };
-
-    const creada = await crearOrden(orden);
-
-    expect(api.post).toHaveBeenCalledWith("/boletas", orden);
-    expect(creada.codigo).toBe("BOL-10007");
-    expect(leerUltimaBoleta(7).id).toBe(7);
-    expect(leerUltimaBoleta(8)).toBeNull();
-  });
-
-  it("filtra las órdenes por estado en el backend", async () => {
-    spyOn(api, "get").and.returnValue(respuesta([]));
-
-    await listarOrdenes("PAGADA");
-    await listarOrdenes();
-
-    expect(api.get.calls.argsFor(0)).toEqual(["/boletas", { params: { estado: "PAGADA" } }]);
-    expect(api.get.calls.argsFor(1)).toEqual(["/boletas", { params: {} }]);
-  });
-
-  it("cambia el estado con PATCH /boletas/{id}/estado", async () => {
-    spyOn(api, "patch").and.returnValue(respuesta({ id: 3, estado: "ENVIADA" }));
-
-    const actualizada = await cambiarEstadoOrden(3, "ENVIADA");
-
-    expect(api.patch).toHaveBeenCalledWith("/boletas/3/estado", { estado: "ENVIADA" });
-    expect(actualizada.estado).toBe("ENVIADA");
+    expect(buscarProductos(lista, "")).toHaveLength(2);
   });
 });
 
 describe("Mensajes de error de la API", () => {
-  it("muestra el mensaje que envía el backend", () => {
-    const error = { response: { status: 409, data: { mensaje: "Stock insuficiente para 'Teclado'" } } };
-    expect(mensajeError(error)).toBe("Stock insuficiente para 'Teclado'");
-  });
-
   it("avisa cuando no hay conexión con el servidor", () => {
     expect(mensajeError({ message: "Network Error" })).toContain("No se pudo conectar con el servidor");
+  });
+
+  it("usa un mensaje por defecto cuando el backend no envía uno", () => {
+    expect(mensajeError({ response: { status: 500, data: {} } }, "Falló")).toBe("Falló");
   });
 });

@@ -7,6 +7,9 @@ export default function CampoTexto({
   error = "",
   marcaAgua = "",
   requerido = false,
+  minimo,
+  maximo,
+  paso,
 }) {
   return (
     <div className="mb-3">
@@ -19,8 +22,11 @@ export default function CampoTexto({
         name={id}
         type={tipo}
         className={`form-control ${error ? "is-invalid-awsd" : ""}`}
-        value={valor}
+        value={valor ?? ""}
         placeholder={marcaAgua}
+        min={minimo}
+        max={maximo}
+        step={paso}
         onChange={(evento) => onChange(evento.target.value)}
       />
       {error && <div className="invalid-feedback-awsd d-block">{error}</div>}

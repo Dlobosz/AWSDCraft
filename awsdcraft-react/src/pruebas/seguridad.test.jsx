@@ -1,6 +1,10 @@
-import { Route, Routes } from "react-router-dom";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import RutaProtegida from "../componentes/RutaProtegida";
 import { ProveedorSesion } from "../contexto/SesionContexto";
+import LayoutAdmin from "../layouts/LayoutAdmin";
 import api from "../servicios/api";
 import {
   cerrarSesionGuardada,
@@ -10,9 +14,8 @@ import {
   tokenPorVencer,
 } from "../servicios/sesion";
 import { decidirAcceso, rutaInicial, tienePermiso } from "../utilidades/permisos";
-import { esperar, montarEnRuta } from "./utilidadesPrueba";
 
-/** Crea un JWT de prueba (sin firma real) con el vencimiento indicado en segundos. */
+/** Crea un JWT de prueba (sin firma real) que vence en los segundos indicados. */
 function tokenQueVenceEn(segundos) {
   const base64url = (objeto) =>
     btoa(JSON.stringify(objeto)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -24,9 +27,13 @@ const vendedor = { id: 2, nombre: "Camila", correo: "camila.reyes@duoc.cl", rol:
 const cliente = { id: 3, nombre: "Javier", correo: "javier.munoz@gmail.com", rol: "CLIENTE" };
 const admin = { id: 1, nombre: "Diego", correo: "diegolobos@gmail.com", rol: "ADMIN" };
 
-describe("Gestión de sesión en sessionStorage", () => {
-  beforeEach(() => sessionStorage.clear());
+function iniciarSesionComo(usuario) {
+  guardarSesion({ accessToken: tokenQueVenceEn(600), refreshToken: "r", usuario });
+  // GET /auth/perfil: el backend confirma la sesión al recargar la página.
+  vi.spyOn(api, "get").mockResolvedValue({ data: usuario });
+}
 
+describe("Gestión de sesión en sessionStorage", () => {
   it("guarda y recupera la sesión (sobrevive a una recarga de página)", () => {
     guardarSesion({ accessToken: "a.b.c", refreshToken: "r", usuario: vendedor, otro: "ignorado" });
 
@@ -61,22 +68,19 @@ describe("Gestión de sesión en sessionStorage", () => {
 });
 
 describe("Interceptor de axios", () => {
-  beforeEach(() => sessionStorage.clear());
+  const interceptor = () => api.interceptors.request.handlers[0].fulfilled;
 
   it("agrega el header Authorization: Bearer cuando hay sesión vigente", async () => {
     const token = tokenQueVenceEn(600);
     guardarSesion({ accessToken: token, refreshToken: "r", usuario: admin });
-    const interceptor = api.interceptors.request.handlers[0].fulfilled;
 
-    const config = await interceptor({ url: "/usuarios", headers: {} });
+    const config = await interceptor()({ url: "/usuarios", headers: {} });
 
     expect(config.headers.Authorization).toBe(`Bearer ${token}`);
   });
 
   it("no agrega Authorization cuando no hay sesión", async () => {
-    const interceptor = api.interceptors.request.handlers[0].fulfilled;
-
-    const config = await interceptor({ url: "/productos", headers: {} });
+    const config = await interceptor()({ url: "/productos", headers: {} });
 
     expect(config.headers.Authorization).toBeUndefined();
   });
@@ -116,56 +120,82 @@ describe("Permisos por rol", () => {
 });
 
 describe("RutaProtegida", () => {
-  let vista;
-
-  beforeEach(() => sessionStorage.clear());
-  afterEach(() => vista && vista.desmontar());
-
-  function aplicacion() {
-    return (
+  function montar(ruta) {
+    return render(
       <ProveedorSesion>
-        <Routes>
-          <Route
-            path="/admin/usuarios"
-            element={
-              <RutaProtegida permiso="usuarios">
-                <p>Mantenedor de usuarios</p>
-              </RutaProtegida>
-            }
-          />
-          <Route path="/login" element={<p>Pantalla de login</p>} />
-        </Routes>
+        <MemoryRouter initialEntries={[ruta]}>
+          <Routes>
+            <Route
+              path="/admin/usuarios"
+              element={
+                <RutaProtegida permiso="usuarios">
+                  <p>Mantenedor de usuarios</p>
+                </RutaProtegida>
+              }
+            />
+            <Route path="/login" element={<p>Pantalla de login</p>} />
+          </Routes>
+        </MemoryRouter>
       </ProveedorSesion>
     );
   }
 
-  it("redirige al login cuando no hay sesión", async () => {
-    vista = montarEnRuta(aplicacion(), "/admin/usuarios");
-    await esperar();
+  beforeEach(() => sessionStorage.clear());
 
-    expect(vista.texto()).toContain("Pantalla de login");
-    expect(vista.texto()).not.toContain("Mantenedor de usuarios");
+  it("redirige al login cuando no hay sesión", async () => {
+    montar("/admin/usuarios");
+
+    expect(await screen.findByText("Pantalla de login")).toBeInTheDocument();
+    expect(screen.queryByText("Mantenedor de usuarios")).not.toBeInTheDocument();
   });
 
   it("muestra Acceso denegado a un VENDEDOR que intenta abrir Usuarios", async () => {
-    guardarSesion({ accessToken: tokenQueVenceEn(600), refreshToken: "r", usuario: vendedor });
-    spyOn(api, "get").and.returnValue(Promise.resolve({ data: vendedor })); // GET /auth/perfil
+    iniciarSesionComo(vendedor);
+    montar("/admin/usuarios");
 
-    vista = montarEnRuta(aplicacion(), "/admin/usuarios");
-    await esperar();
-
-    expect(vista.texto()).toContain("Acceso denegado");
-    expect(vista.texto()).not.toContain("Mantenedor de usuarios");
+    expect(await screen.findByText("Acceso denegado")).toBeInTheDocument();
+    expect(screen.queryByText("Mantenedor de usuarios")).not.toBeInTheDocument();
   });
 
   it("permite el acceso al ADMIN después de validar la sesión con el backend", async () => {
-    guardarSesion({ accessToken: tokenQueVenceEn(600), refreshToken: "r", usuario: admin });
-    spyOn(api, "get").and.returnValue(Promise.resolve({ data: admin }));
+    iniciarSesionComo(admin);
+    montar("/admin/usuarios");
 
-    vista = montarEnRuta(aplicacion(), "/admin/usuarios");
-    await esperar();
-
+    expect(await screen.findByText("Mantenedor de usuarios")).toBeInTheDocument();
     expect(api.get).toHaveBeenCalledWith("/auth/perfil");
-    expect(vista.texto()).toContain("Mantenedor de usuarios");
+  });
+});
+
+describe("Menú del panel según el rol", () => {
+  function montarPanel() {
+    return render(
+      <ProveedorSesion>
+        <MemoryRouter initialEntries={["/admin"]}>
+          <Routes>
+            <Route path="/admin" element={<LayoutAdmin />} />
+          </Routes>
+        </MemoryRouter>
+      </ProveedorSesion>
+    );
+  }
+
+  it("el VENDEDOR solo ve las opciones Órdenes y Productos", async () => {
+    iniciarSesionComo(vendedor);
+    montarPanel();
+
+    expect(await screen.findByRole("link", { name: /Órdenes/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Productos/ })).toBeInTheDocument();
+    ["Dashboard", "Usuarios", "Categorías", "Reportes", "Stock crítico", "Perfil"].forEach((opcion) =>
+      expect(screen.queryByRole("link", { name: new RegExp(opcion) })).not.toBeInTheDocument()
+    );
+  });
+
+  it("el ADMIN ve todas las opciones del panel", async () => {
+    iniciarSesionComo(admin);
+    montarPanel();
+
+    expect(await screen.findByRole("link", { name: /Usuarios/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Reportes/ })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Dashboard/ })).toBeInTheDocument();
   });
 });
