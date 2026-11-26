@@ -9,10 +9,19 @@ Proyecto semestral de la asignatura **DSY1104 – Desarrollo Fullstack II** (Duo
 | Parte | Ubicación | Tecnología |
 |---|---|---|
 | **Frontend** (versión vigente) | carpeta [`awsdcraft-react/`](awsdcraft-react/README.md) de este repositorio | React 18 + Vite + Axios |
-| **Backend** (API REST) | repositorio **AWSDCraft-backend** | Spring Boot 4 + MySQL + JWT |
+| **Backend** (API REST) | repositorio **[AWSD_Backend](https://github.com/Dlobosz/AWSD_Backend)** | Spring Boot 3.4 + MySQL + JWT |
 | Sitio HTML original (Evaluación 1) | raíz de este repositorio (`index.html`, `pages/`, `js/`) | HTML, CSS y JavaScript |
 
 En la Evaluación 3 el frontend React dejó de usar `localStorage` para los datos del negocio: ahora consume la API REST del backend, inicia sesión con JWT, mantiene la sesión al recargar la página y restringe pantallas y acciones según el rol (Administrador, Vendedor, Cliente). Las instrucciones para ejecutarlo están en [`awsdcraft-react/README.md`](awsdcraft-react/README.md).
+
+### Documentos de la entrega (carpeta [`documentos/`](documentos))
+
+| Documento | Contenido |
+|---|---|
+| `ERS AWSDCraft v3.docx` | Especificación de requisitos actualizada con el backend, la API y la seguridad |
+| `Manual de Usuario AWSDCraft.docx` | Instalación, configuración y uso de la tienda y del panel, con pantallazos |
+| `Documentación APIs AWSDCraft.xlsx` | Planilla con los 29 endpoints de la API (Anexo 3) |
+| `Documentación APIs e Integración AWSDCraft.docx` | Modelo de datos, endpoints, seguridad JWT, integración, pruebas y resultados (Anexo 2) |
 
 ---
 
