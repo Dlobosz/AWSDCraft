@@ -2,12 +2,13 @@
 
 Tienda AWSDCraft.cl construida con React + Vite + Bootstrap 5, **integrada con el backend Spring Boot** mediante API REST (Axios) y autenticación JWT.
 
-- Backend (API REST + Swagger): repositorio **AWSDCraft-backend** → http://localhost:8090/swagger-ui.html
+- Backend (API REST + Swagger): repositorio **[AWSD_Backend](https://github.com/Dlobosz/AWSD_Backend)** → <http://localhost:8090/swagger-ui.html>
 
 ## Requisitos
 
 - Node.js 20 o superior
-- El backend en ejecución (ver su README: `docker compose up -d` y `.\mvnw.cmd spring-boot:run`)
+- El backend en ejecución: MySQL levantado y, en la carpeta del backend, `.\mvnw.cmd spring-boot:run`
+  (sin MySQL instalado: `.\mvnw.cmd spring-boot:run -D"spring-boot.run.profiles=dev"`, que usa H2 en memoria)
 
 ## Instalación y ejecución
 
