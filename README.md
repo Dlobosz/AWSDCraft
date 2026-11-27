@@ -49,4 +49,4 @@ Pruebas: `npm test` (Vitest + Testing Library).
 | `hooks` | `useCarga` (carga datos de la API) y `useBoletaCompra` |
 | `utilidades` | Permisos por rol, validaciones y formato |
 | `datos` | Datos fijos que no están en el backend (blogs, regiones y comunas) |
-| `pruebas` | 72 pruebas con Vitest |
+| `pruebas` | 73 pruebas con Vitest |
