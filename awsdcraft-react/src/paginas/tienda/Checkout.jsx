@@ -112,6 +112,7 @@ export default function Checkout() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="nombre"
+                    autoCompletar="given-name"
                     etiqueta="Nombre"
                     requerido
                     valor={formulario.nombre}
@@ -122,6 +123,7 @@ export default function Checkout() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="apellidos"
+                    autoCompletar="family-name"
                     etiqueta="Apellidos"
                     requerido
                     valor={formulario.apellidos}
@@ -132,6 +134,8 @@ export default function Checkout() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="correo"
+                    autoCompletar="email"
+                    marcaAgua="nombre@gmail.com"
                     etiqueta="Correo"
                     tipo="email"
                     requerido
@@ -147,6 +151,8 @@ export default function Checkout() {
                 <div className="col-12 col-md-8">
                   <CampoTexto
                     id="calle"
+                    autoCompletar="street-address"
+                    marcaAgua="Ej: Av. Providencia 1234"
                     etiqueta="Calle"
                     requerido
                     valor={formulario.calle}
@@ -157,6 +163,7 @@ export default function Checkout() {
                 <div className="col-12 col-md-4">
                   <CampoTexto
                     id="departamento"
+                    autoCompletar="address-line2"
                     etiqueta="Departamento (opcional)"
                     marcaAgua="Ej: 603"
                     valor={formulario.departamento}

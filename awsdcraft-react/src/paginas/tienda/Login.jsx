@@ -65,6 +65,8 @@ export default function Login() {
             <form onSubmit={enviar} noValidate>
               <CampoTexto
                 id="correoLogin"
+                autoCompletar="email"
+                marcaAgua="nombre@duoc.cl"
                 etiqueta="Correo"
                 tipo="email"
                 requerido
@@ -74,6 +76,7 @@ export default function Login() {
               />
               <CampoTexto
                 id="passwordLogin"
+                autoCompletar="current-password"
                 etiqueta="Contraseña"
                 tipo="password"
                 requerido

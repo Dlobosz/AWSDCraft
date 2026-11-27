@@ -6,6 +6,7 @@ export default function CampoTexto({
   tipo = "text",
   error = "",
   marcaAgua = "",
+  autoCompletar,
   requerido = false,
   minimo,
   maximo,
@@ -24,6 +25,8 @@ export default function CampoTexto({
         className={`form-control ${error ? "is-invalid-awsd" : ""}`}
         value={valor ?? ""}
         placeholder={marcaAgua}
+        autoComplete={autoCompletar}
+        aria-invalid={error ? "true" : "false"}
         min={minimo}
         max={maximo}
         step={paso}

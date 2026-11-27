@@ -66,6 +66,8 @@ export default function Contacto() {
             <form onSubmit={enviar} noValidate>
               <CampoTexto
                 id="nombreContacto"
+                autoCompletar="name"
+                marcaAgua="Ej: Diego Lobos"
                 etiqueta="Nombre"
                 requerido
                 valor={nombre}
@@ -74,6 +76,8 @@ export default function Contacto() {
               />
               <CampoTexto
                 id="correoContacto"
+                autoCompletar="email"
+                marcaAgua="nombre@gmail.com"
                 etiqueta="Correo (opcional)"
                 tipo="email"
                 valor={correo}

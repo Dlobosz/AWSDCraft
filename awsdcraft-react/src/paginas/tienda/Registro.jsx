@@ -113,6 +113,7 @@ export default function Registro() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="run"
+                    autoCompletar="off"
                     etiqueta="RUN"
                     requerido
                     marcaAgua="Ej: 190110222"
@@ -124,6 +125,7 @@ export default function Registro() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="fechaNacimiento"
+                    autoCompletar="bday"
                     etiqueta="Fecha de nacimiento"
                     tipo="date"
                     valor={formulario.fechaNacimiento}
@@ -134,6 +136,8 @@ export default function Registro() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="nombre"
+                    autoCompletar="given-name"
+                    marcaAgua="Ej: Diego"
                     etiqueta="Nombre"
                     requerido
                     valor={formulario.nombre}
@@ -144,6 +148,8 @@ export default function Registro() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="apellidos"
+                    autoCompletar="family-name"
+                    marcaAgua="Ej: Lobos Ortiz"
                     etiqueta="Apellidos"
                     requerido
                     valor={formulario.apellidos}
@@ -154,6 +160,8 @@ export default function Registro() {
                 <div className="col-12">
                   <CampoTexto
                     id="correo"
+                    autoCompletar="email"
+                    marcaAgua="nombre@duoc.cl o nombre@gmail.com"
                     etiqueta="Correo"
                     tipo="email"
                     requerido
@@ -165,6 +173,8 @@ export default function Registro() {
                 <div className="col-12">
                   <CampoTexto
                     id="direccion"
+                    autoCompletar="street-address"
+                    marcaAgua="Ej: Av. Providencia 1234"
                     etiqueta="Dirección"
                     requerido
                     valor={formulario.direccion}
@@ -186,6 +196,8 @@ export default function Registro() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="password"
+                    autoCompletar="new-password"
+                    marcaAgua="Entre 4 y 10 caracteres"
                     etiqueta="Contraseña"
                     tipo="password"
                     requerido
@@ -197,6 +209,8 @@ export default function Registro() {
                 <div className="col-12 col-md-6">
                   <CampoTexto
                     id="confirmarPassword"
+                    autoCompletar="new-password"
+                    marcaAgua="Repite la contraseña"
                     etiqueta="Confirmar contraseña"
                     tipo="password"
                     requerido
