@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import axios from "axios";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -9,9 +10,7 @@ import api from "../servicios/api";
 import {
   cerrarSesionGuardada,
   guardarSesion,
-  leerPayload,
   leerSesion,
-  tokenPorVencer,
 } from "../servicios/sesion";
 import { decidirAcceso, rutaInicial, tienePermiso } from "../utilidades/permisos";
 
@@ -57,30 +56,40 @@ describe("Gestión de sesión en sessionStorage", () => {
     cerrarSesionGuardada();
     expect(leerSesion()).toBeNull();
   });
-
-  it("detecta cuándo el JWT está vencido o por vencer", () => {
-    expect(tokenPorVencer(tokenQueVenceEn(600))).toBe(false);
-    expect(tokenPorVencer(tokenQueVenceEn(10))).toBe(true); // dentro del margen de 30 s
-    expect(tokenPorVencer(tokenQueVenceEn(-60))).toBe(true);
-    expect(tokenPorVencer("token-invalido")).toBe(true);
-    expect(leerPayload(tokenQueVenceEn(600)).sub).toBe("test@gmail.com");
-  });
 });
 
 describe("Interceptor de axios", () => {
   const interceptor = () => api.interceptors.request.handlers[0].fulfilled;
 
-  it("agrega el header Authorization: Bearer cuando hay sesión vigente", async () => {
+  it("agrega el header Authorization: Bearer cuando hay sesión", () => {
     const token = tokenQueVenceEn(600);
     guardarSesion({ accessToken: token, refreshToken: "r", usuario: admin });
 
-    const config = await interceptor()({ url: "/usuarios", headers: {} });
+    const config = interceptor()({ url: "/usuarios", headers: {} });
 
     expect(config.headers.Authorization).toBe(`Bearer ${token}`);
   });
 
-  it("no agrega Authorization cuando no hay sesión", async () => {
-    const config = await interceptor()({ url: "/productos", headers: {} });
+  it("ante un 401 renueva el token con /auth/refresh y repite la petición", async () => {
+    guardarSesion({ accessToken: "vencido", refreshToken: "r", usuario: admin });
+    const nuevos = { accessToken: "nuevo", refreshToken: "r2", usuario: admin };
+    vi.spyOn(axios, "post").mockResolvedValue({ data: nuevos });
+    const repetir = vi.fn().mockResolvedValue({ data: admin, status: 200, headers: {} });
+
+    const alFallar = api.interceptors.response.handlers[0].rejected;
+    const respuesta = await alFallar({
+      response: { status: 401 },
+      config: { url: "/auth/perfil", headers: {}, adapter: repetir },
+    });
+
+    expect(axios.post).toHaveBeenCalledWith(expect.stringContaining("/auth/refresh"), { refreshToken: "r" });
+    expect(repetir.mock.calls[0][0].headers.Authorization).toBe("Bearer nuevo");
+    expect(respuesta.data).toEqual(admin);
+    expect(leerSesion().accessToken).toBe("nuevo");
+  });
+
+  it("no agrega Authorization cuando no hay sesión", () => {
+    const config = interceptor()({ url: "/productos", headers: {} });
 
     expect(config.headers.Authorization).toBeUndefined();
   });

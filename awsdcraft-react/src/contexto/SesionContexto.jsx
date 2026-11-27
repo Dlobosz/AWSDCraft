@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { EVENTO_SESION_EXPIRADA, EVENTO_SESION_RENOVADA } from "../servicios/api";
+import { EVENTO_SESION_EXPIRADA } from "../servicios/api";
 import * as authServicio from "../servicios/authServicio";
 import {
   actualizarUsuarioGuardado,
@@ -16,7 +16,7 @@ const SesionContexto = createContext(null);
  *  1. Al cargar la app lee la sesión guardada en sessionStorage (así sobrevive al F5).
  *  2. Si existe, la valida contra el backend (GET /auth/perfil) para confirmar que el token sigue
  *     siendo válido y obtener el rol actualizado. Si el token venció, el interceptor lo renueva.
- *  3. Escucha los eventos del interceptor: sesión renovada o sesión expirada.
+ *  3. Escucha el aviso del interceptor cuando la sesión expira.
  */
 export function ProveedorSesion({ children }) {
   const [usuario, setUsuario] = useState(() => leerSesion()?.usuario ?? null);
@@ -50,14 +50,9 @@ export function ProveedorSesion({ children }) {
       setUsuario(null);
       setAvisoSesion("Tu sesión expiró. Inicia sesión nuevamente.");
     }
-    function alRenovar(evento) {
-      if (evento.detail) setUsuario(evento.detail);
-    }
     window.addEventListener(EVENTO_SESION_EXPIRADA, alExpirar);
-    window.addEventListener(EVENTO_SESION_RENOVADA, alRenovar);
     return () => {
       window.removeEventListener(EVENTO_SESION_EXPIRADA, alExpirar);
-      window.removeEventListener(EVENTO_SESION_RENOVADA, alRenovar);
     };
   }, []);
 

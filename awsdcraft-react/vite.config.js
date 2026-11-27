@@ -9,11 +9,5 @@ export default defineConfig({
     setupFiles: "./src/pruebas/configuracion.js",
     include: ["src/pruebas/**/*.test.jsx"],
     css: false,
-    coverage: {
-      provider: "v8",
-      reporter: ["text", "html"],
-      reportsDirectory: "coverage",
-      include: ["src/componentes/**", "src/servicios/**", "src/utilidades/**", "src/contexto/**", "src/hooks/**"],
-    },
   },
 });

@@ -1,45 +1,36 @@
 import axios from "axios";
-import { cerrarSesionGuardada, guardarSesion, leerSesion, tokenPorVencer } from "./sesion";
+import { cerrarSesionGuardada, guardarSesion, leerSesion } from "./sesion";
 
 // URL del backend definida en .env (VITE_API_URL). Si no existe se usa la de desarrollo local.
 export const API_URL = import.meta.env?.VITE_API_URL || "http://localhost:8090/api/v1";
 
+// Evento que avisa a la aplicación que la sesión terminó (el refresh token ya no sirve).
 export const EVENTO_SESION_EXPIRADA = "awsdcraft:sesion-expirada";
-export const EVENTO_SESION_RENOVADA = "awsdcraft:sesion-renovada";
 
-const RUTAS_AUTH = ["/auth/login", "/auth/registro", "/auth/refresh", "/auth/logout"];
-
-/** Cliente axios único para toda la aplicación: las páginas nunca arman URLs ni headers a mano. */
+/** Cliente axios único: todas las páginas llaman al backend a través de él. */
 const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,
   headers: { "Content-Type": "application/json" },
 });
 
-// Cliente sin interceptores, solo para renovar el token (evita ciclos infinitos).
-const clienteRenovacion = axios.create({ baseURL: API_URL, timeout: 10000 });
-
-function esRutaAuth(url = "") {
-  return RUTAS_AUTH.some((ruta) => url.startsWith(ruta));
-}
+// Rutas donde un 401 significa "credenciales incorrectas", no "token vencido": no se renueva.
+const RUTAS_SIN_RENOVACION = ["/auth/login", "/auth/registro", "/auth/refresh", "/auth/logout"];
 
 let renovacionEnCurso = null;
 
 /**
  * Pide un nuevo par de tokens con el refresh token (POST /auth/refresh).
- * Si varias peticiones necesitan renovar a la vez, todas esperan la misma promesa.
- * Si la renovación falla, la sesión se cierra y se avisa a la aplicación.
+ * Si varias peticiones reciben 401 al mismo tiempo, todas esperan la misma renovación.
  */
-export function renovarSesion() {
+function renovarSesion() {
   const sesion = leerSesion();
-  if (!sesion?.refreshToken) return Promise.reject(new Error("No hay sesión para renovar"));
 
   if (!renovacionEnCurso) {
-    renovacionEnCurso = clienteRenovacion
-      .post("/auth/refresh", { refreshToken: sesion.refreshToken })
+    renovacionEnCurso = axios
+      .post(`${API_URL}/auth/refresh`, { refreshToken: sesion.refreshToken })
       .then(({ data }) => {
         guardarSesion(data);
-        window.dispatchEvent(new CustomEvent(EVENTO_SESION_RENOVADA, { detail: data.usuario }));
         return data;
       })
       .catch((error) => {
@@ -54,46 +45,28 @@ export function renovarSesion() {
   return renovacionEnCurso;
 }
 
-// INTERCEPTOR DE PETICIÓN: agrega "Authorization: Bearer <token>" y renueva el token si está por vencer.
-api.interceptors.request.use(async (config) => {
-  let sesion = leerSesion();
-
-  if (sesion && !esRutaAuth(config.url) && tokenPorVencer(sesion.accessToken)) {
-    try {
-      sesion = await renovarSesion();
-    } catch {
-      sesion = null;
-    }
-  }
-
+// 1) Antes de cada petición: agrega "Authorization: Bearer <token>" si hay sesión.
+api.interceptors.request.use((config) => {
+  const sesion = leerSesion();
   if (sesion?.accessToken) {
     config.headers.Authorization = `Bearer ${sesion.accessToken}`;
   }
   return config;
 });
 
-// INTERCEPTOR DE RESPUESTA: si el backend responde 401 (token vencido o revocado) se intenta
-// renovar una sola vez y se repite la petición original de forma transparente para el usuario.
+// 2) Después de cada respuesta: si el backend responde 401 (token vencido), se renueva el token
+//    una sola vez y se repite la petición original.
 api.interceptors.response.use(
   (respuesta) => respuesta,
   async (error) => {
     const original = error.config;
-    const puedeReintentar =
-      error.response?.status === 401 &&
-      original &&
-      !original._reintentado &&
-      !esRutaAuth(original.url) &&
-      leerSesion()?.refreshToken;
+    const puedeRenovar = original && !RUTAS_SIN_RENOVACION.includes(original.url);
 
-    if (puedeReintentar) {
+    if (error.response?.status === 401 && puedeRenovar && !original._reintentado && leerSesion()) {
       original._reintentado = true;
-      try {
-        const nueva = await renovarSesion();
-        original.headers.Authorization = `Bearer ${nueva.accessToken}`;
-        return api(original);
-      } catch {
-        return Promise.reject(error);
-      }
+      const nueva = await renovarSesion();
+      original.headers.Authorization = `Bearer ${nueva.accessToken}`;
+      return api(original);
     }
     return Promise.reject(error);
   }
