@@ -11,8 +11,9 @@ import { actualizarUsuario, crearUsuario, obtenerUsuario } from "../../servicios
 import { ETIQUETAS_ROL, ROLES } from "../../utilidades/permisos";
 import {
   correoPermitido,
+  direccionValida,
+  nombreValido,
   passwordValida,
-  textoRequerido,
   validarRun,
 } from "../../utilidades/validadores";
 
@@ -80,12 +81,12 @@ function FormularioUsuario({ existente, inicial }) {
   function validar() {
     const nuevos = {};
     if (!validarRun(formulario.run)) nuevos.run = "RUN inválido, sin puntos ni guion.";
-    if (!textoRequerido(formulario.nombre, 50)) nuevos.nombre = "Ingresa el nombre (máx. 50).";
-    if (!textoRequerido(formulario.apellidos, 100)) {
-      nuevos.apellidos = "Ingresa los apellidos (máx. 100).";
+    if (!nombreValido(formulario.nombre, 50)) nuevos.nombre = "Ingresa el nombre: al menos 2 letras, sin números.";
+    if (!nombreValido(formulario.apellidos, 100)) {
+      nuevos.apellidos = "Ingresa los apellidos: al menos 2 letras, sin números.";
     }
     if (!correoPermitido(formulario.correo)) {
-      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
+      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com, con al menos 3 caracteres antes de la @.";
     }
     // Al crear, la contraseña es obligatoria; al editar, vacía significa "no cambiarla".
     if ((!existente || formulario.password !== "") && !passwordValida(formulario.password)) {
@@ -93,7 +94,9 @@ function FormularioUsuario({ existente, inicial }) {
     }
     if (formulario.region === "") nuevos.region = "Selecciona una región.";
     if (formulario.comuna === "") nuevos.comuna = "Selecciona una comuna.";
-    if (!textoRequerido(formulario.direccion, 300)) nuevos.direccion = "Ingresa la dirección.";
+    if (!direccionValida(formulario.direccion)) {
+      nuevos.direccion = "Ingresa la dirección con número (mínimo 5 caracteres).";
+    }
 
     setErrores(nuevos);
     return Object.keys(nuevos).length === 0;

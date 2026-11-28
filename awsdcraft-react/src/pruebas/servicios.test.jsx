@@ -18,7 +18,15 @@ import {
   obtenerProducto,
 } from "../servicios/productosServicio";
 import { formatearPrecio, precioConDescuento } from "../utilidades/formato";
-import { correoPermitido, passwordValida, validarRun } from "../utilidades/validadores";
+import {
+  correoPermitido,
+  direccionValida,
+  nombreValido,
+  numeroOpcionalValido,
+  passwordValida,
+  textoRequerido,
+  validarRun,
+} from "../utilidades/validadores";
 
 const producto = {
   id: 1,
@@ -42,16 +50,33 @@ describe("Validadores del formulario", () => {
     expect(validarRun("")).toBe(false);
   });
 
-  it("acepta solo los dominios de correo permitidos", () => {
+  it("acepta solo los dominios permitidos, con al menos 3 caracteres antes de la @", () => {
     expect(correoPermitido("diegolobos@gmail.com")).toBe(true);
     expect(correoPermitido("alumno@duoc.cl")).toBe(true);
     expect(correoPermitido("usuario@hotmail.com")).toBe(false);
+    expect(correoPermitido("a@gmail.com")).toBe(false);
   });
 
-  it("exige una contraseña de entre 4 y 10 caracteres", () => {
+  it("exige largos mínimos: contraseña de 4 a 10, nombres de 2 letras y dirección con número", () => {
     expect(passwordValida("1234")).toBe(true);
     expect(passwordValida("123")).toBe(false);
     expect(passwordValida("12345678901")).toBe(false);
+
+    expect(nombreValido("Ana", 50)).toBe(true);
+    expect(nombreValido("José Ñúñez", 50)).toBe(true);
+    expect(nombreValido("A", 50)).toBe(false);
+    expect(nombreValido("Ana2", 50)).toBe(false);
+
+    expect(direccionValida("Av. Providencia 1234")).toBe(true);
+    expect(direccionValida("Calle sin número")).toBe(false);
+    expect(direccionValida("a1")).toBe(false);
+
+    expect(numeroOpcionalValido("")).toBe(true);
+    expect(numeroOpcionalValido("603")).toBe(true);
+    expect(numeroOpcionalValido("a")).toBe(false);
+
+    expect(textoRequerido("Hola", 100, 3)).toBe(true);
+    expect(textoRequerido("Ho", 100, 3)).toBe(false);
   });
 });
 

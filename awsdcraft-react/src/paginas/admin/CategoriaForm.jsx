@@ -59,12 +59,12 @@ function FormularioCategoria({ existente, inicial }) {
 
   function validar() {
     const nuevos = {};
-    if (!textoRequerido(formulario.nombre, 60)) nuevos.nombre = "Ingresa el nombre.";
+    if (!textoRequerido(formulario.nombre, 60, 3)) nuevos.nombre = "Ingresa el nombre: entre 3 y 60 caracteres.";
     if (formulario.slug && !/^[a-z0-9-]+$/.test(formulario.slug)) {
       nuevos.slug = "Usa solo minúsculas, números o guiones (o déjalo vacío para generarlo).";
     }
-    if (!textoRequerido(formulario.descripcion, 255)) {
-      nuevos.descripcion = "Ingresa una descripción.";
+    if (!textoRequerido(formulario.descripcion, 255, 10)) {
+      nuevos.descripcion = "Ingresa una descripción: entre 10 y 255 caracteres.";
     }
 
     setErrores(nuevos);

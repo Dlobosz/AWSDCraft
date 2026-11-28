@@ -85,8 +85,8 @@ function FormularioProducto({ existente, inicial, categorias }) {
 
   function validar() {
     const nuevos = {};
-    if (!textoRequerido(formulario.codigo, 20)) nuevos.codigo = "Ingresa el código del producto.";
-    if (!textoRequerido(formulario.nombre, 100)) nuevos.nombre = "Ingresa el nombre.";
+    if (!textoRequerido(formulario.codigo, 20, 3)) nuevos.codigo = "Ingresa el código: entre 3 y 20 caracteres.";
+    if (!textoRequerido(formulario.nombre, 100, 3)) nuevos.nombre = "Ingresa el nombre: entre 3 y 100 caracteres.";
     if (!formulario.categoriaId) nuevos.categoriaId = "Selecciona una categoría.";
     if (!esEnteroValido(formulario.precio) || Number(formulario.precio) <= 0) {
       nuevos.precio = "El precio debe ser un número mayor a 0.";
@@ -101,8 +101,8 @@ function FormularioProducto({ existente, inicial, categorias }) {
     if (!esEnteroValido(formulario.descuento) || Number(formulario.descuento) > 90) {
       nuevos.descuento = "El descuento debe estar entre 0 y 90.";
     }
-    if (!textoRequerido(formulario.descripcion, 500)) {
-      nuevos.descripcion = "Ingresa una descripción.";
+    if (!textoRequerido(formulario.descripcion, 500, 10)) {
+      nuevos.descripcion = "Ingresa una descripción: entre 10 y 500 caracteres.";
     }
 
     setErrores(nuevos);

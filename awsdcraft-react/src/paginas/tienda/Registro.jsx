@@ -8,8 +8,9 @@ import { useSesion } from "../../contexto/SesionContexto";
 import { erroresDeCampo, mensajeError } from "../../servicios/api";
 import {
   correoPermitido,
+  direccionValida,
+  nombreValido,
   passwordValida,
-  textoRequerido,
   validarRun,
 } from "../../utilidades/validadores";
 
@@ -43,14 +44,16 @@ export default function Registro() {
   function validar() {
     const nuevos = {};
     if (!validarRun(formulario.run)) nuevos.run = "RUN inválido, ingrésalo sin puntos ni guion.";
-    if (!textoRequerido(formulario.nombre, 50)) nuevos.nombre = "Ingresa tu nombre (máx. 50).";
-    if (!textoRequerido(formulario.apellidos, 100)) {
-      nuevos.apellidos = "Ingresa tus apellidos (máx. 100).";
+    if (!nombreValido(formulario.nombre, 50)) nuevos.nombre = "Ingresa tu nombre: al menos 2 letras, sin números.";
+    if (!nombreValido(formulario.apellidos, 100)) {
+      nuevos.apellidos = "Ingresa tus apellidos: al menos 2 letras, sin números.";
     }
     if (!correoPermitido(formulario.correo)) {
-      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
+      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com, con al menos 3 caracteres antes de la @.";
     }
-    if (!textoRequerido(formulario.direccion, 300)) nuevos.direccion = "Ingresa tu dirección.";
+    if (!direccionValida(formulario.direccion)) {
+      nuevos.direccion = "Ingresa tu dirección con número (mínimo 5 caracteres).";
+    }
     if (formulario.region === "") nuevos.region = "Selecciona una región.";
     if (formulario.comuna === "") nuevos.comuna = "Selecciona una comuna.";
     if (!passwordValida(formulario.password)) {

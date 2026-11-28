@@ -10,7 +10,12 @@ import { useSesion } from "../../contexto/SesionContexto";
 import { erroresDeCampo, mensajeError } from "../../servicios/api";
 import { crearOrden } from "../../servicios/ordenesServicio";
 import { formatearPrecio } from "../../utilidades/formato";
-import { correoPermitido, textoRequerido } from "../../utilidades/validadores";
+import {
+  correoPermitido,
+  direccionValida,
+  nombreValido,
+  numeroOpcionalValido,
+} from "../../utilidades/validadores";
 
 export default function Checkout() {
   const { items, total, vaciar } = useCarrito();
@@ -41,12 +46,19 @@ export default function Checkout() {
 
   function validar() {
     const nuevos = {};
-    if (!textoRequerido(formulario.nombre, 50)) nuevos.nombre = "Ingresa tu nombre.";
-    if (!textoRequerido(formulario.apellidos, 100)) nuevos.apellidos = "Ingresa tus apellidos.";
-    if (!correoPermitido(formulario.correo)) {
-      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
+    if (!nombreValido(formulario.nombre, 50)) nuevos.nombre = "Ingresa tu nombre: al menos 2 letras, sin números.";
+    if (!nombreValido(formulario.apellidos, 100)) {
+      nuevos.apellidos = "Ingresa tus apellidos: al menos 2 letras, sin números.";
     }
-    if (!textoRequerido(formulario.calle, 300)) nuevos.calle = "Ingresa la dirección de entrega.";
+    if (!correoPermitido(formulario.correo)) {
+      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com, con al menos 3 caracteres antes de la @.";
+    }
+    if (!direccionValida(formulario.calle)) {
+      nuevos.calle = "Ingresa la calle y el número (mínimo 5 caracteres).";
+    }
+    if (!numeroOpcionalValido(formulario.departamento)) {
+      nuevos.departamento = "El departamento o casa debe incluir un número (máx. 10 caracteres).";
+    }
     if (formulario.region === "") nuevos.region = "Selecciona una región.";
     if (formulario.comuna === "") nuevos.comuna = "Selecciona una comuna.";
 
@@ -164,9 +176,10 @@ export default function Checkout() {
                   <CampoTexto
                     id="departamento"
                     autoCompletar="address-line2"
-                    etiqueta="Departamento (opcional)"
+                    etiqueta="Depto. o casa (opcional)"
                     marcaAgua="Ej: 603"
                     valor={formulario.departamento}
+                    error={errores.departamento}
                     onChange={(valor) => cambiar("departamento", valor)}
                   />
                 </div>

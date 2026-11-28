@@ -28,7 +28,7 @@ export default function Login() {
 
     const nuevos = {};
     if (!correoPermitido(correo)) {
-      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
+      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com, con al menos 3 caracteres antes de la @.";
     }
     if (password.trim() === "") nuevos.password = "Ingresa tu contraseña.";
     setErrores(nuevos);

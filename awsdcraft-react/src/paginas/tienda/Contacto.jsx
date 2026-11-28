@@ -2,7 +2,7 @@ import { useState } from "react";
 import Boton from "../../componentes/Boton";
 import CampoTexto from "../../componentes/CampoTexto";
 import MensajeAlerta from "../../componentes/MensajeAlerta";
-import { correoPermitido, textoRequerido } from "../../utilidades/validadores";
+import { correoPermitido, nombreValido, textoRequerido } from "../../utilidades/validadores";
 
 export default function Contacto() {
   const [nombre, setNombre] = useState("");
@@ -15,12 +15,12 @@ export default function Contacto() {
     evento.preventDefault();
 
     const nuevos = {};
-    if (!textoRequerido(nombre, 100)) nuevos.nombre = "Ingresa tu nombre (máx. 100).";
+    if (!nombreValido(nombre, 100)) nuevos.nombre = "Ingresa tu nombre: al menos 2 letras, sin números.";
     if (correo.trim() !== "" && !correoPermitido(correo)) {
-      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
+      nuevos.correo = "Usa un correo @duoc.cl, @profesor.duoc.cl o @gmail.com, con al menos 3 caracteres antes de la @.";
     }
-    if (!textoRequerido(comentario, 500)) {
-      nuevos.comentario = "Escribe tu comentario (máx. 500 caracteres).";
+    if (!textoRequerido(comentario, 500, 10)) {
+      nuevos.comentario = "Escribe tu comentario: entre 10 y 500 caracteres.";
     }
 
     setErrores(nuevos);
